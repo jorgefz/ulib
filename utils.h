@@ -59,7 +59,8 @@ void * xmalloc(size_t bytes)
     void *ptr = malloc(bytes);
     if (ptr)
         return ptr;
-    return (NULL);
+    fprintf(stderr, " Error: failed to allocate %zu bytes\n", bytes);
+    exit(-1);
 }
 
 /*
@@ -72,7 +73,7 @@ int xfree(void *ptr)
 		free(ptr);
 		return 0;
 	}
-	return (-1);
+	return 1;
 }
 
 
@@ -85,7 +86,7 @@ Slices string from index i to index j.
 On fail, it returns the original string.
 */
 char *
-strslc(char *s, const size_t i, const size_t j)
+strslc(char *s, size_t i, size_t j)
 {
 	/* Input checks */
 	if( (i>j) || strlen(s)<(j-i+1) )
@@ -134,7 +135,7 @@ strrev(char *s)
 
 /* Generates an array of a given value */
 int *
-intval(int *arr, size_t s, int val)
+intval(int * arr, size_t s, int val)
 {
 	for(size_t i=0; i<s; i++)
 		arr[i] = val;
@@ -221,7 +222,7 @@ a_intrange(size_t s, size_t start, size_t step)
 
 /* Copies an array to another */
 int *
-intcpy(int *dest, const int *src, const size_t s)
+intcpy(int *dest, const int *src, size_t s)
 {
 	if( !dest || !src)
 		return (NULL);
@@ -236,7 +237,7 @@ and returns a pointer to it.
 You will have to free it afterwards.
 */
 int *
-a_intcpy(const int *src, const size_t s)
+a_intcpy(const int *src, size_t s)
 {
 	if(!src)
 		return (NULL);
@@ -247,8 +248,8 @@ a_intcpy(const int *src, const size_t s)
 
 /* Concatenates two arrays of integers into destination */
 int *
-intcat(int *dest, const int *a, const size_t as, 
-	const int *b, const size_t bs)
+intcat(int *dest, const int *a, size_t as, 
+		const int *b, size_t bs)
 {
 	/* Check input */
 	if (!dest || !a || !b)
@@ -268,8 +269,8 @@ and returns a pointer to it.
 You will have to free it afterwards.
 */
 int *
-a_intcat(const int *a, const size_t as, 
-		const int *b, const size_t bs)
+a_intcat(const int *a, size_t as, 
+		const int *b, size_t bs)
 {
 	/* Check input */
 	if (!a || !b)
@@ -283,7 +284,7 @@ a_intcat(const int *a, const size_t as,
 
 /* Prints an array of integers to stdout */
 void
-intprint(const int *src, const size_t s)
+intprint(const int *src, size_t s)
 {
 	for(size_t i=0; i<s; i++)
 		printf("%d ", src[i]);
@@ -292,7 +293,7 @@ intprint(const int *src, const size_t s)
 
 /* Reverses input array */
 int *
-intrev(int *arr, const size_t len)
+intrev(int *arr, size_t len)
 {
 	/*Check input */
 	if(arr == NULL)
@@ -317,7 +318,7 @@ intrev(int *arr, const size_t len)
 /* 	STATISTICS */
 /* Finds maximum of array */
 int
-intmax(const int *arr, const size_t len)
+intmax(const int *arr, size_t len)
 {
 	/* Initialise max value on first array member */
 	int max = arr[0];
@@ -332,7 +333,7 @@ intmax(const int *arr, const size_t len)
 
 /* Finds minimum of array */
 int
-intmin(const int *arr, const size_t len)
+intmin(const int *arr, size_t len)
 {
 	/* Initialise min value on first array member */
 	int min = arr[0];
@@ -347,7 +348,7 @@ intmin(const int *arr, const size_t len)
 
 /* Finds index of maximum of array */
 uint
-intimax(int *arr, size_t len)
+intimax(const int *arr, size_t len)
 {
 	/* Initialise max value and its index */
 	int max = arr[0];
@@ -366,7 +367,7 @@ intimax(int *arr, size_t len)
 
 /* Finds index of minimum of array */
 size_t
-intimin(int *arr, size_t len)
+intimin(const int *arr, size_t len)
 {
 	/* Initialise min value and its index */
 	int min = arr[0];
@@ -384,7 +385,7 @@ intimin(int *arr, size_t len)
 
 /* Sums the members of an integer array */
 int
-intsum(int *arr, size_t len)
+intsum(const int *arr, size_t len)
 {
 	int sum = 0;
 	for(size_t i=0; i<len; i++)

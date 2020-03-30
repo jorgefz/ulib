@@ -24,7 +24,7 @@ typedef unsigned int uint;
 
 *Safe Memory Allocation*
 Allocates a number of input bytes using 'malloc'.
-On fail, it returns a NULL pointer.
+On fail, it exits the program.
 
 ```c
 void *ptr = xmalloc(size_t bytes)
@@ -33,7 +33,7 @@ void *ptr = xmalloc(size_t bytes)
 *Safe Memory Freeing*
 Attempts to free a pointer.
 On success, it returns 0.
-Otherwise, it returns -1.
+Otherwise, it returns 1.
 
 ```c
 int ret_val = xfree(void *ptr)
@@ -48,7 +48,7 @@ Returns pointer to sliced string.
 On fail, it returns a NULL pointer.
 
 ```c	
-char *str = strslc(char *s, const size_t i, const size_t j)
+char *str = strslc(char *s, size_t i, size_t j)
 ```
 
 *String reversing*
@@ -64,7 +64,7 @@ char *str = strrev(char *s)
 
 *Array of zeros*.
 Generate an array of integers equal to zero,
-stored at the address to whicht he input pointer points.
+stored at the address to which the input pointer points.
 It returns the pointer on success,
 and NULL otherwise.
 
@@ -147,7 +147,7 @@ to stdout horizontally,
 with values separated by single spaces.
 
 ```c
-intprint(int *a, size_t size)
+intprint(const int *a, size_t size)
 ```
 
 *Concatenate two arrays*.
@@ -156,7 +156,7 @@ into an input array 'dest'.
 On fail, it returns a NULL pointer.
 
 ```c
-int *arr = intcat(int *dest, int *a, size_t as, int *b, size_t bs)
+int *arr = intcat(int *dest, const int *a, size_t as, const int *b, size_t bs)
 ```
 
 *Concatenate two arrays (allocated)*.
@@ -166,7 +166,7 @@ and a pointer to it is returned.
 Note that it must be freed after its use.
 
 ```c
-int *arr = a_intcat(int *a, size_t as, int *b, size_t bs)
+int *arr = a_intcat(const int *a, size_t as, const int *b, size_t bs)
 ```
 
 *Copy an array*.
@@ -174,7 +174,7 @@ Copies the values of an array into another.
 On fail, it returns a NULL pointer.
 
 ```c
-int *arr = intcpy(int *dest, int *src, size_t s)
+int *arr = intcpy(int *dest, const int *src, size_t s)
 ```
 
 *Copy an array (allocated)*.
@@ -183,7 +183,7 @@ allocated array, and a pointer to it is returned.
 Note that it must be freed after its use.
 
 ```c
-int *arr = a_intcpy(int *src, size_t s)
+int *arr = a_intcpy(const int *src, size_t s)
 ```
 
 *Reverse an array*
@@ -200,28 +200,34 @@ int *arr = intrev(int *arr, size_t s)
 Finds the maximum value in an array,
 and returns the value.
 ```c
-int max = intmax(const int *arr, const size_t len)
+int max = intmax(const int *arr, size_t len)
 ```
 
 *Find index of maximum*.
 Finds the maximum value in an array,
 and returns array index of its location.
 ```c
-size_t imax = intimax(const int *arr, const size_t len)
+size_t imax = intimax(const int *arr, size_t len)
 ```
 
 *Find minimum*.
 Finds the minimum value in an array,
 and returns the value.
 ```c
-int min = intmin(const int *arr, const size_t len)
+int min = intmin(const int *arr, size_t len)
 ```
 
 *Find index of minimum*.
 Finds the minimum value in an array,
 and returns array index of its location.
 ```c
-size_t imin = intimin(const int *arr, const size_t len)
+size_t imin = intimin(const int *arr, size_t len)
+```
+
+*Sum array members*.
+Sums array members and returns rhe result.
+```c
+size_t sum = intsum(const int *arr, size_t len)
 ```
 
 ### *WIP*.
