@@ -226,6 +226,7 @@ size_t imin = intimin(const int *arr, const size_t len)
 
 ### *WIP*.
 * Sort array in ascending/descending order.
+* Sort and return array of old indices (argsort).
 * Switch sign of array members.
 * Set all array members to positice/negative.
 * Add/Subtract/multiply/divide members of two arrays.
