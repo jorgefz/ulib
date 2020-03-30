@@ -32,6 +32,13 @@
 				printing, concatenation, copying,
 				and reversing.
 
+	1.1 - 30/03/2020
+		Added auto-allocation functions for 1D Arrays:
+			a_intzeros, a_intones, a_intval, a_intrange,
+			a_intcpy, a_intcat.
+		Added maximum and minimum functions for 1D Arrays:
+			intmax, intmin, intimax, intimin
+		Added sum function for 1D Arrays: intsum
 
 */
 
@@ -106,18 +113,13 @@ strrev(char *s)
 	/* Declaring temporary space to save string */
 	uint len = strlen(s);
 	char buffer[len];
-	char *b;
-	b = &(buffer[0]);
 
 	/* Copying original string */
-	strcpy(b, s);
+	strcpy(buffer, s);
 
 	/* Reversing string from buffer */
-	size_t j = len-1;
-	for(size_t i=0; i<len; i++){
-		s[i] = buffer[j];
-		j--;
-	}
+	for(size_t i=0; i<len; i++)
+		s[i] = buffer[len-i-1];
 
 	return s;
 }
@@ -129,23 +131,6 @@ strrev(char *s)
 	INTEGER 1D ARRAYS
 */
 
-/* Generates an array of zeros */
-int *
-intzeros(int *arr, size_t s)
-{
-	for(size_t i=0; i<s; i++)
-		arr[i] = 0;
-	return arr;
-}
-
-/* Generates an array of ones */
-int *
-intones(int *arr, size_t s)
-{
-	for(size_t i=0; i<s; i++)
-		arr[i] = 1;
-	return arr;
-}
 
 /* Generates an array of a given value */
 int *
@@ -153,6 +138,53 @@ intval(int *arr, size_t s, int val)
 {
 	for(size_t i=0; i<s; i++)
 		arr[i] = val;
+	return arr;
+}
+
+/* Generates an array of a given value */
+int *
+a_intval(size_t s, int val)
+{
+	int *arr = xmalloc(s*sizeof(int));
+	intval(arr, s, val);
+	return arr;
+}
+
+/* Generates an array of zeros */
+int *
+intzeros(int *arr, size_t s)
+{
+	intval(arr, s, 0);
+	return arr;
+}
+
+/*
+Allocates and generates an array of zeros.
+You will need to free the pointer afterwards manually.
+*/
+int *
+a_intzeros(size_t s)
+{
+	int *arr = a_intval(s, 0);
+	return arr;
+}
+
+/* Generates an array of ones */
+int *
+intones(int *arr, size_t s)
+{
+	intval(arr, s, 1);
+	return arr;
+}
+
+/*
+Allocates and generates an array of ones.
+You will need to free the pointer afterwards manually.
+*/
+int *
+a_intones(size_t s)
+{
+	int *arr = a_intval(s, 1);
 	return arr;
 }
 
@@ -169,6 +201,50 @@ intrange(int *arr, size_t s,
 	return arr;
 }
 
+/*
+Allocates and generates an array of values in a range.
+You will need to free the pointer afterwards.
+*/
+int *
+a_intrange(size_t s, size_t start, size_t step)
+{
+	/*Allocating pointer*/
+	int *arr = xmalloc(s*sizeof(int));
+	/*Evaluating array*/
+	size_t val = start;
+	for(size_t i=0; i<s; i++){
+		arr[i] = val;
+		val += step;
+	}
+	return arr;
+}
+
+/* Copies an array to another */
+int *
+intcpy(int *dest, const int *src, const size_t s)
+{
+	if( !dest || !src)
+		return (NULL);
+	for(size_t i=0; i<s; i++)
+		dest[i] = src[i];
+	return dest;
+}
+
+/*
+Copies an array into another array it allocates,
+and returns a pointer to it.
+You will have to free it afterwards.
+*/
+int *
+a_intcpy(const int *src, const size_t s)
+{
+	if(!src)
+		return (NULL);
+	int *dest = xmalloc(s*sizeof(int));
+	intcpy(dest, src, s);
+	return dest;
+}
+
 /* Concatenates two arrays of integers into destination */
 int *
 intcat(int *dest, const int *a, const size_t as, 
@@ -179,40 +255,44 @@ intcat(int *dest, const int *a, const size_t as,
 		return (NULL);
 
 	/* Append first array */
-	for(size_t i=0; i<as; i++)
-		dest[i] = a[i];
-
+	intcpy(dest, a, as);
 	/* Append second array */
-	for(size_t i=as; i<(bs+as); i++)
-		dest[i] = b[i-as];
+	intcpy(dest+as, b, bs);
+	return dest;
+}
 
+/*
+Concatenates two arrays of integers,
+allocates an array with the result,
+and returns a pointer to it.
+You will have to free it afterwards.
+*/
+int *
+a_intcat(const int *a, const size_t as, 
+		const int *b, const size_t bs)
+{
+	/* Check input */
+	if (!a || !b)
+		return (NULL);
+
+	int *dest = xmalloc((as+bs)*sizeof(int));
+	intcpy(dest, a, as);
+	intcpy(dest+as, b, bs);
 	return dest;
 }
 
 /* Prints an array of integers to stdout */
 void
-intprint(int *src, size_t s)
+intprint(const int *src, const size_t s)
 {
 	for(size_t i=0; i<s; i++)
 		printf("%d ", src[i]);
 	printf("\n");
 }
 
-/* Prints an array of integers to stdout */
-int *
-intcpy(int *dest, int *src, size_t s)
-{
-	if( !dest || !src)
-		return (NULL);
-	for(size_t i=0; i<s; i++)
-		dest[i] = src[i];
-	return dest;
-}
-
-
 /* Reverses input array */
 int *
-intrev(int *arr, size_t len)
+intrev(int *arr, const size_t len)
 {
 	/*Check input */
 	if(arr == NULL)
@@ -226,12 +306,105 @@ intrev(int *arr, size_t len)
 	intcpy(b, arr, len);
 
 	/* Reversing string from buffer */
-	size_t j = len-1;
-	for(size_t i=0; i<len; i++){
-		arr[i] = buffer[j];
-		j--;
-	}
+	for(size_t i=0; i<len; i++)
+		arr[i] = buffer[len-i-1];
 
 	return arr;
 }
 
+
+
+/* 	STATISTICS */
+/* Finds maximum of array */
+int
+intmax(const int *arr, const size_t len)
+{
+	/* Initialise max value on first array member */
+	int max = arr[0];
+
+	/* Looping through array */
+	for(size_t i=0; i<len; i++){
+		if( arr[i] > max)
+			max = arr[i];
+	}
+	return max;
+}
+
+/* Finds minimum of array */
+int
+intmin(const int *arr, const size_t len)
+{
+	/* Initialise min value on first array member */
+	int min = arr[0];
+
+	/* Looping through array */
+	for(size_t i=0; i<len; i++){
+		if( arr[i] < min)
+			min = arr[i];
+	}
+	return min;
+}
+
+/* Finds index of maximum of array */
+uint
+intimax(int *arr, size_t len)
+{
+	/* Initialise max value and its index */
+	int max = arr[0];
+	int imax;
+
+	/* Looping through array */
+	for(size_t i=0; i<len; i++){
+		if( arr[i] > max ){
+			max = arr[i];
+			imax = i;
+		}
+	}
+	return imax;
+}
+
+
+/* Finds index of minimum of array */
+size_t
+intimin(int *arr, size_t len)
+{
+	/* Initialise min value and its index */
+	int min = arr[0];
+	int imin = 0;
+
+	/* Looping through array */
+	for(size_t i=0; i<len; i++){
+		if( arr[i] < min ){
+			min = arr[i];
+			imin = i;
+		}
+	}
+	return imin;
+}
+
+/* Sums the members of an integer array */
+int
+intsum(int *arr, size_t len)
+{
+	int sum = 0;
+	for(size_t i=0; i<len; i++)
+		sum += arr[i];
+	return sum;
+}
+
+//intsort_asc - sorts in ascending order
+//intsort_des - sorts in descending order
+//intsign - switches sign of array members
+//intneg - makes all array members negative
+//intpos - makes all array members positive
+
+//intadd - sums two arrays of same size
+//intsub - subtracts two arrays of same size
+//intmult - multiplies two arrays
+//intdiv - divides members of two arrays
+//intcmp - (sum of abs(value) of both, and compare)
+
+
+//---Repeat this for arrays of doubles
+
+//---Matrix operations

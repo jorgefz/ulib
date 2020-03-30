@@ -62,46 +62,95 @@ char *str = strrev(char *s)
 
 ## 1D Arrays
 
-*Array of zeros*
-Generate an array of integers equal to zero
+*Array of zeros*.
+Generate an array of integers equal to zero,
+stored at the address to whicht he input pointer points.
+It returns the pointer on success,
+and NULL otherwise.
 
 ```c
 int *arr = intzeros(int *a, size_t size)
 ```
 
-*Array of ones*
-Generate an array of integers equal to one
+*Array of zeros (allocated)*.
+Allocate and generate an array of integers equal to zero.
+It returns a pointer to the allocated array.
+Note that it must be freed after its use.
+
+```c
+int *arr = a_intzeros(size_t size)
+```
+
+*Array of ones*.
+Generate an array of integers equal to zero,
+stored at the address to which the input pointer points.
+It returns the pointer on success,
+and NULL otherwise.
 
 ```c
 int *arr = intones(int *a, size_t size)
 ```
 
-*Array of same values*
-Generate an array of integers equal to an input value.
+*Array of ones (allocated)*.
+Allocate and generate an array of integers equal to one.
+It returns a pointer to the allocated array.
+Note that it must be freed after its use.
+
+```c
+int *arr = a_intones(size_t size)
+```
+
+*Array of same values*.
+Generate an array of integers equal to an input value,
+stored at the address to which the input pointer points.
+It returns the pointer on success,
+and NULL otherwise.
 
 ```c
 int *arr = intval(int *a, size_t size, int value)
 ```
 
-*Array of values in range*
+*Array of same values (allocated)*.
+Allocate and generate an array of integers equal to an input value.
+It returns a pointer to the allocated array.
+Note that it must be freed after its use.
+
+```c
+int *arr = a_intval(size_t size, int value)
+```
+
+*Array of values in range*.
 Generate an array of integers equal to 
 a range of input values, specified by a
 starting value 'start' and a step size 'step'.
+Stored at the address to which the input pointer points.
+It returns the pointer on success,
+and NULL otherwise.
 
 ```c
 int *arr = intrange(int *a, size_t size, int start, int step)
 ```
 
-*Print integer array*
+*Array of values in range (allocated)*.
+Allocate and generate an array of integers equal to 
+a range of input values, specified by a
+starting value 'start' and a step size 'step'.
+It returns a pointer to the allocated array.
+Note that it must be freed after its use.
+```c
+int *arr = a_intrange(size_t size, int start, int step)
+```
+
+*Print integer array*.
 Prints a 1D array of integers 
 to stdout horizontally, 
 with values separated by single spaces.
 
 ```c
-int *arr = intprint(int *a, size_t size)
+intprint(int *a, size_t size)
 ```
 
-*Concatenate two arrays*
+*Concatenate two arrays*.
 Concatenates two arrays of integers
 into an input array 'dest'.
 On fail, it returns a NULL pointer.
@@ -110,7 +159,17 @@ On fail, it returns a NULL pointer.
 int *arr = intcat(int *dest, int *a, size_t as, int *b, size_t bs)
 ```
 
-*Copy an array*
+*Concatenate two arrays (allocated)*.
+Concatenates two arrays of integers
+into an allocated array 'dest',
+and a pointer to it is returned.
+Note that it must be freed after its use.
+
+```c
+int *arr = a_intcat(int *a, size_t as, int *b, size_t bs)
+```
+
+*Copy an array*.
 Copies the values of an array into another.
 On fail, it returns a NULL pointer.
 
@@ -118,40 +177,72 @@ On fail, it returns a NULL pointer.
 int *arr = intcpy(int *dest, int *src, size_t s)
 ```
 
+*Copy an array (allocated)*.
+Copies the values of an array into another
+allocated array, and a pointer to it is returned.
+Note that it must be freed after its use.
+
+```c
+int *arr = a_intcpy(int *src, size_t s)
+```
+
 *Reverse an array*
-Copies the values of an array into another.
-On fail, it returns a NULL pointer.
+Reverses the values of an input array,
+and saves them at the same location.
+It returns a pointer to the input array.
+On fail, it returns NULL.
 
 ```c
 int *arr = intrev(int *arr, size_t s)
 ```
-	
-WIP - Repeat for double datatype
+
+*Find maximum*.
+Finds the maximum value in an array,
+and returns the value.
+```c
+int max = intmax(const int *arr, const size_t len)
+```
+
+*Find index of maximum*.
+Finds the maximum value in an array,
+and returns array index of its location.
+```c
+size_t imax = intimax(const int *arr, const size_t len)
+```
+
+*Find minimum*.
+Finds the minimum value in an array,
+and returns the value.
+```c
+int min = intmin(const int *arr, const size_t len)
+```
+
+*Find index of minimum*.
+Finds the minimum value in an array,
+and returns array index of its location.
+```c
+size_t imin = intimin(const int *arr, const size_t len)
+```
+
+### *WIP*.
+* Sort array in ascending/descending order.
+* Switch sign of array members.
+* Set all array members to positice/negative.
+* Add/Subtract/multiply/divide members of two arrays.
+* Compare two arrays.
+* Repeat for double datatype
 
 
 
 ## 2D Number Matrices (WIP)
 
-intadd - add two matrices of integers
-	*mat = intadd(*a, *b, rows, cols)
-intsub - add two matrices of integers
-	*mat = intsub(*a, *b, rows, cols)
-	
-intmult - multiply the members of two matrices of integers directly
-	*mat = intmult(*a, *b, rows, cols)
-	
-intamult - matrix multiplication of two matrices of integers
-	*mat = intmult(*a, *b, rows_a, cols_a)
-
-inttsp - transpose of matrix of integers
-	*mat = inttsp(*a, rows, cols)
-	
-intdet - determinant of matrix of integers
-	*mat = intdet(*a, rows, cols)
-	
-intinv - inverse of matrix of integers
-	*mat = intinv(*a, rows, cols)
-
-
+* Add two matrices of integers.
+	*mat = mintadd(*a, *b, rows, cols)
+* Subtract two matrices of integers.
+	*mat = mintsub(*a, *b, rows, cols)
+* Multiply the members of two matrices of integers directly.
+	*mat = mintmult(*a, *b, rows, cols)
+* Divide the members of two matrices of integers directly.
+	*mat = mintdiv(*a, *b, rows, cols)
 
  
