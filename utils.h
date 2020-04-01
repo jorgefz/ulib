@@ -40,6 +40,11 @@
 			intmax, intmin, intimax, intimin
 		Added sum function for 1D Arrays: intsum
 
+	1.2 - 31/03/2020
+		Modified xmalloc to return NULL and print an error
+			message to stderr on fail.
+
+
 */
 
 
@@ -53,14 +58,23 @@ typedef unsigned int uint;
 /*
 	MEMORY
 */
-/* Allocates some memory of length 'bytes' */
+/*
+Allocates some memory of length 'bytes',
+and returns a pointer ot it.
+On fail,  
+*/
 void * xmalloc(size_t bytes)
 {
+	if (bytes == 0){
+		fprintf(stderr, " Error: can't allocate 0 bytes\n");
+		return (NULL);
+	}
     void *ptr = malloc(bytes);
     if (ptr)
         return ptr;
-    fprintf(stderr, " Error: failed to allocate %zu bytes\n", bytes);
-    exit(-1);
+    
+    fprintf(stderr, " Error: can't allocate %zu bytes\n", bytes);
+    return (NULL);
 }
 
 /*
@@ -146,7 +160,7 @@ intval(int * arr, size_t s, int val)
 int *
 a_intval(size_t s, int val)
 {
-	int *arr = xmalloc(s*sizeof(int));
+	int *arr = (int *) xmalloc(s*sizeof(int));
 	intval(arr, s, val);
 	return arr;
 }
@@ -210,7 +224,7 @@ int *
 a_intrange(size_t s, size_t start, size_t step)
 {
 	/*Allocating pointer*/
-	int *arr = xmalloc(s*sizeof(int));
+	int *arr = (int *) xmalloc(s*sizeof(int));
 	/*Evaluating array*/
 	size_t val = start;
 	for(size_t i=0; i<s; i++){
@@ -241,7 +255,7 @@ a_intcpy(const int *src, size_t s)
 {
 	if(!src)
 		return (NULL);
-	int *dest = xmalloc(s*sizeof(int));
+	int *dest = (int *) xmalloc(s*sizeof(int));
 	intcpy(dest, src, s);
 	return dest;
 }
@@ -276,7 +290,7 @@ a_intcat(const int *a, size_t as,
 	if (!a || !b)
 		return (NULL);
 
-	int *dest = xmalloc((as+bs)*sizeof(int));
+	int *dest = (int *) xmalloc((as+bs)*sizeof(int));
 	intcpy(dest, a, as);
 	intcpy(dest+as, b, bs);
 	return dest;
@@ -393,11 +407,13 @@ intsum(const int *arr, size_t len)
 	return sum;
 }
 
-//intsort_asc - sorts in ascending order
-//intsort_des - sorts in descending order
 //intsign - switches sign of array members
 //intneg - makes all array members negative
 //intpos - makes all array members positive
+//introll - moves array members places forwards/backward
+
+//intsort - sorts in ascending/descending order
+//intissort - sorts array and returns list of array indices
 
 //intadd - sums two arrays of same size
 //intsub - subtracts two arrays of same size

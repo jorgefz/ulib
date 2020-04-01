@@ -6,11 +6,11 @@
 Contains several small useful functions for C 
 using only the standard libraries.
 These functions can be classified into:
-* Useful data types
+* New Data types
 * Memory Management
 * String Manipulation
 * 1D number array manipulation
-* 2D matrix operations (WIP)
+* 2D matrix manipulation (WIP)
 * File manipulation (WIP)
 
 ## Data Types
@@ -22,17 +22,17 @@ typedef unsigned int uint;
 
 ## Memory
 
-*Safe Memory Allocation*
+*Safe Memory Allocation*.
 Allocates a number of input bytes using 'malloc'.
-On fail, it exits the program.
+On fail, it prints an error message to stderr
+and returns a NULL pointer.
 
 ```c
 void *ptr = xmalloc(size_t bytes)
 ```
 
-*Safe Memory Freeing*
-Attempts to free a pointer.
-On success, it returns 0.
+*Safe Memory Freeing*.
+Attempts to free a pointer. On success, it returns 0.
 Otherwise, it returns 1.
 
 ```c
@@ -42,8 +42,9 @@ int ret_val = xfree(void *ptr)
 
 ## Strings
 
-*String slicing*
-Slices a string at two input points *i* and *j*.
+*String slicing*.
+Slices a string at two input points *i* and *j*,
+keeping the characters at both indices.
 Returns pointer to sliced string.
 On fail, it returns a NULL pointer.
 
@@ -51,7 +52,7 @@ On fail, it returns a NULL pointer.
 char *str = strslc(char *s, size_t i, size_t j)
 ```
 
-*String reversing*
+*String reversing*.
 Reverses the order of the characters in a string.
 Returns pointer to reversed string.
 On fail, it returns a NULL pointer.
@@ -63,8 +64,8 @@ char *str = strrev(char *s)
 ## 1D Arrays
 
 *Array of zeros*.
-Generate an array of integers equal to zero,
-stored at the address to which the input pointer points.
+Generate an array of integers equal to zero
+at the location of the input pointer.
 It returns the pointer on success,
 and NULL otherwise.
 
@@ -82,8 +83,8 @@ int *arr = a_intzeros(size_t size)
 ```
 
 *Array of ones*.
-Generate an array of integers equal to zero,
-stored at the address to which the input pointer points.
+Generate an array of integers equal to one,
+at the location of the input pointer.
 It returns the pointer on success,
 and NULL otherwise.
 
@@ -102,7 +103,7 @@ int *arr = a_intones(size_t size)
 
 *Array of same values*.
 Generate an array of integers equal to an input value,
-stored at the address to which the input pointer points.
+at the location of the input pointer.
 It returns the pointer on success,
 and NULL otherwise.
 
@@ -122,8 +123,8 @@ int *arr = a_intval(size_t size, int value)
 *Array of values in range*.
 Generate an array of integers equal to 
 a range of input values, specified by a
-starting value 'start' and a step size 'step'.
-Stored at the address to which the input pointer points.
+starting value 'start' and a step size 'step',
+at the location of the input pointer.
 It returns the pointer on success,
 and NULL otherwise.
 
@@ -170,7 +171,8 @@ int *arr = a_intcat(const int *a, size_t as, const int *b, size_t bs)
 ```
 
 *Copy an array*.
-Copies the values of an array into another.
+Copies the values of an array into another,
+and returns a pointer ot it.
 On fail, it returns a NULL pointer.
 
 ```c
@@ -186,11 +188,11 @@ Note that it must be freed after its use.
 int *arr = a_intcpy(const int *src, size_t s)
 ```
 
-*Reverse an array*
-Reverses the values of an input array,
+*Reverse an array*.
+Reverses the values of an input array
 and saves them at the same location.
 It returns a pointer to the input array.
-On fail, it returns NULL.
+On fail, it returns the NULL pointer.
 
 ```c
 int *arr = intrev(int *arr, size_t s)
@@ -205,7 +207,7 @@ int max = intmax(const int *arr, size_t len)
 
 *Find index of maximum*.
 Finds the maximum value in an array,
-and returns array index of its location.
+and returns its index in the array.
 ```c
 size_t imax = intimax(const int *arr, size_t len)
 ```
@@ -219,13 +221,13 @@ int min = intmin(const int *arr, size_t len)
 
 *Find index of minimum*.
 Finds the minimum value in an array,
-and returns array index of its location.
+and returns its index in the array.
 ```c
 size_t imin = intimin(const int *arr, size_t len)
 ```
 
 *Sum array members*.
-Sums array members and returns rhe result.
+Sums array members and returns the result.
 ```c
 size_t sum = intsum(const int *arr, size_t len)
 ```
