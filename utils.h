@@ -1027,17 +1027,41 @@ fltroll(double *arr, size_t len, int offset)
 
 
 /*
-Delete array element specified by input index.
-Note that new length is reduced by one.
+Delete array element specified by input index,
+store in input array 'dest', and return a pointer to it.
+Note that 'must' have a size of at least len-1.
 */
 double *
-fltdel(double *arr, size_t len, size_t index)
+fltdel(double *dest, const double *arr, 
+			size_t len, size_t index)
 {
+	fltcpy(dest, arr, len-1);
 	if (index >= len)
-		return arr;
+		return dest;
 	for(size_t i=index; i<(len-1); i++)
-		arr[i] = arr[i+1];
-	return arr;
+		dest[i] = arr[i+1];
+	return dest;
+}
+
+
+/*
+Delete array element specified by input index,
+store new array in allocated memory, and return a
+pointer to it.
+Note that the size of the new array is one integer shorter
+than the size of the previous one, and must be freed
+after its use.
+*/
+double *
+a_fltdel(const double *arr, size_t len, size_t index)
+{
+
+	double *dest = a_fltcpy(arr, len-1);
+	if (index >= len)
+		return dest;
+	for(size_t i=index; i<(len-1); i++)
+		dest[i] = arr[i+1];
+	return dest;
 }
 
 
@@ -1074,11 +1098,11 @@ after its use.
 double *
 a_fltins(const double *arr, size_t len, size_t index, double val)
 {
-	double *dest = a_fltzeros(len+1);
-	if(!dest)
+	double *temp = a_fltzeros(len+1);
+	if(!temp)
 		return (NULL);
-	fltins(dest, arr, len, index, val);
-	return dest;
+	fltins(temp, arr, len, index, val);
+	return temp;
 }
 
 
@@ -1127,12 +1151,16 @@ fltfunc(double (*func)(), double *arr, size_t len)
 
 /*
 Compares two arrays 'a' and 'b' and returns a value that
-is zero if a==b, positive if a>b, and negative if a<b.
+is zero if a==b, and non-zero if a!=b.
 */
 double
 fltcmp(const double *a, const double *b, size_t len)
 {
-	double cmp = fabs(fltsum(a,len)) - fabs(fltsum(b,len));
+	double temp[len];
+	double *t = &(temp[0]);
+	t = fltcpy(t, a, len);
+	fltsub(t, b, len);
+	double cmp = fltsum(fltpos(t, len), len);
 	return cmp;
 }
 
@@ -1222,9 +1250,10 @@ fltlog10(double *arr, size_t len)
 double
 fltdot(const double *a, const double *b, size_t len)
 {
-	double *arr = a_fltcpy(a, len);
-	double dot = fltsum(fltmult(arr, b, len), len);
-	free(arr);
+	double temp[len];
+	double *t = &(temp[0]); 
+	t = fltcpy(t, a, len);
+	double dot = fltsum(fltmult(t, b, len), len);
 	return dot;
 }
 
