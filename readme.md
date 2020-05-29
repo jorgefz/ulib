@@ -679,6 +679,9 @@ Note that return array must have enough memory.
 int *arr = fltisnan(int *dest, const double *arr, size_t len)
 ```
 
+
+## 1D Array Data Type Conversion
+
 *Convert array of integers into doubles*.
 Casts an array of integers into doubles values, 
 and returns a pointer to it.
