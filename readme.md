@@ -792,7 +792,7 @@ Reads the lines in a file, skipping the empty ones and the comments, as defined 
 char **ReadTxtLines(char **lines, size_t maxRead, const char *path, const char *comment)
 ```
 
-###*Load data from file*
+### *Load data from file*
 Automatically reads data from an input file at location 'path'. The data is expected to be organised in rows and columns, in which columns are separated by a delimiter character 'delim', and individual lines are stored in memory with maximum size 'maxSize'. Comments starting with input character 'comment' are skipped. The size of the data to read is stored in input array 'shape' of two members, storing the number of rows and the number of columns.
 ```c
 char **GenFromTxt(const char *path, size_t *shape, const size_t maxSize, const char delim, const char comment)
