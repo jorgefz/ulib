@@ -35,8 +35,8 @@
 
 	1.1 - 30/03/2020
 		Added auto-allocation functions for 1D Arrays:
-			a_intzeros, a_intones, a_intval, a_intrange,
-			a_intcpy, a_intcat.
+			intzerosA, a_intones, intvalA, a_intrange,
+			intcpyA, a_intcat.
 		Added maximum and minimum functions for 1D Arrays:
 			intmax, intmin, intimax, intimin
 		Added sum function for 1D Arrays: intsum
@@ -65,6 +65,13 @@
 		Added data type conversion functions:
 			inttoflt, a_inttoflt, flttoint, a_flttoint
 		Improved documentation.
+
+	1.5 - 03/06/2020
+		Added functions for Input/Output:
+			getstr, strtoint, strtointArr, strtoflt, strtofltArr,
+			CountTxtLines, ReadTxtLines, GenFromTxt
+		Renamed all allocated functions from 'a_funcname' to 'funcnameA'.
+		
 
 
 	FUTURE PLANS
@@ -95,7 +102,8 @@ Allocates some memory of length 'bytes',
 and returns a pointer ot it.
 On fail, it exits the program.
 */
-void * xmalloc(size_t bytes)
+void *
+xmalloc(size_t bytes)
 {
 	if (bytes == 0){
 		fprintf(stderr, " Error: can't allocate 0 bytes\n");
@@ -115,7 +123,8 @@ void * xmalloc(size_t bytes)
 Checks if pointer points to allocated memory
 before freeing it.
 */
-int xfree(void *ptr)
+int
+xfree(void *ptr)
 {
 	if (ptr){
 		free(ptr);
@@ -130,9 +139,33 @@ int xfree(void *ptr)
 /*
 	STRINGS
 */
+
 /*
-Slices string from index i to index j.
-On fail, it returns the original string.
+Copies an input string into allocated memory,
+and returns a pointer to it.
+Note: free the string once it has been used.
+*/
+char *
+strcpyA(const char *str)
+{
+	if(!str)
+		return (NULL);
+	char *t = malloc((strlen(str)+1)*sizeof(char));
+	if(!t){
+		size_t bytes = strlen(str)*sizeof(char);
+		fprintf(stderr, " Error: failed to allocate %Iu bytes\n", bytes);
+		return (NULL);
+	}
+	strcpy(t, str);
+	return t;
+}
+
+
+/*
+Slices the input string from index i to index j,
+and returns a pointer to it.
+Note that it modifies the input string.
+On fail, it returns a null pointer.
 */
 char *
 strslc(char *s, size_t i, size_t j)
@@ -147,8 +180,39 @@ strslc(char *s, size_t i, size_t j)
 
 	/* Null terminator after right slice */
 	ptr[j-i+1] = '\0';
+	
+	s = ptr;
+	return s;
+}
 
-	return ptr;
+
+/*
+Slices a string 'str' from index i to index j
+and stores the result in the input string 'dest',
+leaving the original string untouched.
+On fail, it returns a null pointer.
+*/
+char *
+strslc2(char *dest, const char *str, size_t i, size_t j)
+{
+	/* Input checks */
+	if( (i>j) || strlen(str)<(j-i+1) )
+		return (NULL);
+
+	//Make temporal string to slice
+	char temp[strlen(str)];
+	char *t = &(temp[0]);
+	strcpy(t, str);
+
+	/* Move pointer to left slice */
+	char *ptr;
+	ptr = t + i;
+
+	/* Null terminator after right slice */
+	ptr[j-i+1] = '\0';
+
+	strcpy(dest, ptr);
+	return dest;
 }
 
 
@@ -193,9 +257,9 @@ intval(int * arr, size_t s, int val)
 
 /* Generates an array of a given value */
 int *
-a_intval(size_t s, int val)
+intvalA(size_t s, int val)
 {
-	int *arr = (int *) malloc(s*sizeof(int));
+	int *arr = malloc(s*sizeof(int));
 	if(!arr)
 		return (NULL);
 	intval(arr, s, val);
@@ -215,9 +279,9 @@ Allocates and generates an array of zeros.
 You will need to free the pointer afterwards manually.
 */
 int *
-a_intzeros(size_t s)
+intzerosA(size_t s)
 {
-	int *arr = a_intval(s, 0);
+	int *arr = intvalA(s, 0);
 	return arr;
 }
 
@@ -234,9 +298,9 @@ Allocates and generates an array of ones.
 You will need to free the pointer afterwards manually.
 */
 int *
-a_intones(size_t s)
+intonesA(size_t s)
 {
-	int *arr = a_intval(s, 1);
+	int *arr = intvalA(s, 1);
 	return arr;
 }
 
@@ -258,7 +322,7 @@ Allocates and generates an array of values in a range.
 You will need to free the pointer afterwards.
 */
 int *
-a_intrange(size_t s, int start, int step)
+intrangeA(size_t s, int start, int step)
 {
 	/*Allocating pointer*/
 	int *arr = (int *) malloc(s*sizeof(int));
@@ -290,7 +354,7 @@ and returns a pointer to it.
 You will have to free it afterwards.
 */
 int *
-a_intcpy(const int *src, size_t s)
+intcpyA(const int *src, size_t s)
 {
 	if(!src)
 		return (NULL);
@@ -323,7 +387,7 @@ and returns a pointer to it.
 You will have to free it afterwards.
 */
 int *
-a_intcat(const int *a, size_t as, 
+intcatA(const int *a, size_t as, 
 		const int *b, size_t bs)
 {
 	/* Check input */
@@ -576,9 +640,9 @@ than the size of the previous one, and must be freed
 after its use.
 */
 int *
-a_intins(const int *arr, size_t len, size_t index, int val)
+intinsA(const int *arr, size_t len, size_t index, int val)
 {
-	int *dest = a_intzeros(len+1);
+	int *dest = intzerosA(len+1);
 	if(!dest)
 		return (NULL);
 	intins(dest, arr, len, index, val);
@@ -663,7 +727,7 @@ intsmult(int *arr, size_t len, int val)
 int
 intdot(const int *a, const int *b, size_t len)
 {
-	int *arr = a_intcpy(a, len);
+	int *arr = intcpyA(a, len);
 	int dot = intsum(intmult(arr, b, len), len);
 	free(arr); 
 	return dot;
@@ -690,7 +754,7 @@ fltval(double * arr, size_t s, double val)
 
 /* Generates an array of a given value */
 double *
-a_fltval(size_t s, double val)
+fltvalA(size_t s, double val)
 {
 	double *arr = (double *) malloc(s*sizeof(double));
 	if(!arr)
@@ -712,9 +776,9 @@ Allocates and generates an array of zeros.
 You will need to free the pointer afterwards manually.
 */
 double *
-a_fltzeros(size_t s)
+fltzerosA(size_t s)
 {
-	double *arr = a_fltval(s, 0);
+	double *arr = fltvalA(s, 0);
 	return arr;
 }
 
@@ -731,9 +795,9 @@ Allocates and generates an array of ones.
 You will need to free the pointer afterwards manually.
 */
 double *
-a_fltones(size_t s)
+fltonesA(size_t s)
 {
-	double *arr = a_fltval(s, 1);
+	double *arr = fltvalA(s, 1);
 	return arr;
 }
 
@@ -755,7 +819,7 @@ Allocates and generates an array of values in a range.
 You will need to free the pointer afterwards.
 */
 double *
-a_fltrange(size_t s, double start, double step)
+fltrangeA(size_t s, double start, double step)
 {
 	/*Allocating pointer*/
 	double *arr = (double *) malloc(s*sizeof(double));
@@ -787,7 +851,7 @@ and returns a pointer to it.
 You will have to free it afterwards.
 */
 double *
-a_fltcpy(const double *src, size_t s)
+fltcpyA(const double *src, size_t s)
 {
 	if(!src)
 		return (NULL);
@@ -820,7 +884,7 @@ and returns a pointer to it.
 You will have to free it afterwards.
 */
 double *
-a_fltcat(const double *a, size_t as, 
+fltcatA(const double *a, size_t as, 
 		const double *b, size_t bs)
 {
 	/* Check input */
@@ -1053,10 +1117,10 @@ than the size of the previous one, and must be freed
 after its use.
 */
 double *
-a_fltdel(const double *arr, size_t len, size_t index)
+fltdelA(const double *arr, size_t len, size_t index)
 {
 
-	double *dest = a_fltcpy(arr, len-1);
+	double *dest = fltcpyA(arr, len-1);
 	if (index >= len)
 		return dest;
 	for(size_t i=index; i<(len-1); i++)
@@ -1096,9 +1160,9 @@ than the size of the previous one, and must be freed
 after its use.
 */
 double *
-a_fltins(const double *arr, size_t len, size_t index, double val)
+fltinsA(const double *arr, size_t len, size_t index, double val)
 {
-	double *temp = a_fltzeros(len+1);
+	double *temp = fltzerosA(len+1);
 	if(!temp)
 		return (NULL);
 	fltins(temp, arr, len, index, val);
@@ -1312,9 +1376,9 @@ Converts an array of integers into an array of doubles,
 allocates the new array, and returns a pointer to it.
 */
 double *
-a_inttoflt(const int *arr, size_t len)
+inttofltA(const int *arr, size_t len)
 {
-	double *dest = a_fltzeros(len);
+	double *dest = fltzerosA(len);
 	for(size_t i=0; i<len; i++)
 		dest[i] = (double)(arr[i]);
 	return dest;
@@ -1334,10 +1398,417 @@ Converts an array of doubles into an array of integers,
 allocates the new array, and returns a pointer to it.
 */
 int *
-a_flttoint(const double *arr, size_t len)
+flttointA(const double *arr, size_t len)
 {
-	int *dest = a_intzeros(len);
+	int *dest = intzerosA(len);
 	for(size_t i=0; i<len; i++)
 		dest[i] = (int)(arr[i]);
 	return dest;
 }
+
+
+
+
+
+
+/*
+	INPUT FUNCTIONS
+*/
+
+
+/*
+Asks user for input with a message,
+and returns a string.
+*/
+char *
+getstr(char *dest, const char *msg)
+{
+	size_t max_read = (size_t) 1E5;
+	printf("%s", msg);
+	char *ptr = fgets(dest, max_read, stdin);
+	if(!ptr){
+		printf(" Warning: no input read.\n");
+		return (NULL);
+	}
+	// Removes newline character from end of string
+	if (strchr(dest, '\n'))
+		strslc(dest, 0, strlen(dest)-2);
+	return dest;
+}
+
+
+/*
+Converts a input string 'str' into an integer.
+The result is stored at the input pointer 'dest'.
+On fail, NULL is returned.
+*/
+int *
+strtoint(int *dest, const char *str)
+{
+	char *endptr;
+	int val;
+	if(!str){
+		fprintf(stderr, " Error: can't convert NULL to int.\n");
+		return (NULL);
+	}
+	//Convert string to integer.
+	val = (int) strtol(str, &endptr, 10);
+	//Checks if conversion worked
+	if(endptr == str){
+		fprintf(stderr, " Error: can't convert '%s' to int.\n", str);
+		return (NULL);
+	}
+	*dest = val;
+	return dest;
+}
+
+
+/*
+Converts and array of strings if length 'size' 
+into an array of integers.
+Values are stored in memory of input array 'dest'.
+*/
+int *
+strtointArr(int *dest, const char **str, size_t size)
+{
+	for(size_t i=0; i<size; i++){
+		int *ret = strtoint(&(dest[i]), str[i]);
+		if(!ret)
+			return (NULL);
+	}
+	return dest;
+}
+
+
+
+/*
+Convert string to double.
+*/
+double *
+strtoflt(double *dest, const char *str)
+{
+	char *endptr;
+	int val;
+	if(!str){
+		fprintf(stderr, " Error: can't convert NULL to double.\n");
+		return (NULL);
+	}
+	// Converts string to double
+	val = (double) strtod(str, &endptr);
+	// Checks if conversion worked
+	if(endptr == str){
+		fprintf(stderr, " Error: can't convert '%s' to double.\n", str);
+		return (NULL);
+	}
+	*dest = val;
+	return dest;
+}
+
+/*
+Converts and array of strings of length 'size' 
+into an array of doubles.
+Values are stored in memory of input array 'dest'.
+*/
+double *
+strtofltArr(double *dest, const char **str, size_t size)
+{
+	for(size_t i=0; i<size; i++){
+		double *ret = strtoint(&(dest[i]), str[i]);
+		if(!ret)
+			return (NULL);
+	}
+	return dest;
+}
+
+
+
+/*
+Given a string and a delimiter,
+it returns the number of tokens in the string.
+*/
+size_t
+strtokn(char *str, const char *delim)
+{
+	if(!str)
+		return 0;
+	size_t n = 0;
+	for(size_t i=0; i<strlen(str); i++){
+		if(str[i] == *delim)
+			n++;
+	}
+	return (n+1);
+}
+
+
+/*
+Given a string and a delimiter,
+it runs through the first field
+of the string until the delimiter,
+substitutes the delimiter by a "\0",
+and returns a pointer to the next field.
+If the end of the string is reached, a NULL
+pointer is returned.
+*/
+char *
+strpar(char *ptr, const char delim)
+{
+	if(!ptr)
+		return (NULL);
+ 
+	while(1)
+	{
+		if(ptr[0] == delim){
+			ptr[0] = '\0';
+			ptr++;
+			break;
+		}
+
+		else if(ptr[0] == '\0')
+			return (NULL);
+		ptr++;
+	}
+
+	return ptr;
+}
+
+/*
+Given a string 'str' and a delimiter 'delim',
+it splits the string at the delimiters, stores
+the pointers to the tokens in 'dest', and returns
+a pointer to it.
+On fail, it returns NULL.
+*/
+char **
+strsplit(char **dest, char *str, const char delim)
+{
+	if(!str)
+		return (NULL);
+
+	char *ptr = str;
+	size_t c = 0;
+
+	while( ptr != NULL ){
+		dest[c] = ptr;
+		c++;
+		ptr = strpar(ptr, delim);
+	}
+
+	return dest;
+}
+
+
+
+
+/*
+Counts the lines in a txt file,
+and returns the value.
+The counting process discards empty lines
+and comment lines, defined by an input starting character.
+
+Input:
+	size_t maxRead:	maximum size in which to store a file line.
+	char *path:		string to file path.
+	char *comment:	pointer to character that defines file comment.
+Output:
+	size_t lineCount:	number of non-comment non-empty lines in file.
+*/
+size_t
+CountTxtLines(size_t maxRead, const char *path, const char *comment)
+{
+	FILE *fdata;
+    fdata = fopen(path, "r");
+    if(!fdata){
+    	fprintf(stderr, " Error: '%s' file not found.\n", path);
+    	return 0;
+    }
+
+	char line[maxRead];
+    size_t lineCount = 0;
+    while(fgets(line, maxRead, fdata))
+    {
+    	//Ignore comment lines
+    	if (line[0] == *comment)
+    		continue;
+    	//Ignore empty lines
+    	if (line[0] == '\n')
+    		continue;
+    	lineCount++;
+    }
+
+    fclose(fdata);
+    return lineCount;
+}
+
+
+/*
+Reads the non-comment lines from a txt 
+and returns the strings.
+One should first call CountTxTLines, then initialize
+enough memory.
+
+Input:
+	char *path: 	string with file path.
+	char **lines: 	pointer to array of pointers of strings
+					with enough memory to hold all the lines.
+	size_t MaxRead: memory size of each line in chars.
+	char *comment: 	comment character.
+
+Output:
+	NULL:			if file not found.
+	char **lines:	input pointer defined above.
+*/
+char **
+ReadTxtLines(char **lines, size_t maxRead, 
+				const char *path, const char *comment)
+{
+	// Open file
+	FILE *fdata;
+    fdata = fopen(path, "r");
+    if(!fdata){
+    	fprintf(stderr, " Error: '%s' file not found.\n", path);
+    	return (NULL);
+    }
+
+	char line[maxRead];
+    size_t lineCount = 0;
+    while(fgets(line, maxRead, fdata))
+    {
+    	//Ignore comment lines
+    	if (line[0] == *comment)
+    		continue;
+    	//Ignore empty lines
+    	if (line[0] == '\n')
+    		continue;
+    	strcpy(lines[lineCount], line);
+    	lineCount++;
+    }
+    return lines;
+}
+
+
+/*
+Reads data from a file, separated into rows and columns
+by an input delimiter
+
+Input:
+	size_t *shape: 	pointer to array of two members, stores
+					number of rows and columns of data.
+	size_t maxSize:	maximum size in which to store file line.
+	char *path: 	string with file path.
+	char delim:		character data delimiter.
+	char comment:	character that indicates a comment to skip
+					in the file.
+Output:
+	char **data:	pointer to allocated memory of size
+					shape[0] * shape[1] * maxSize
+					Individual strings can be accessed via
+					data[r*cols + c]
+					where 'r' and 'c' are the row and column
+					of the string, and 'cols' is the total number
+					of columns.
+					As it is allocated, it must be freed afterwards.
+					Both the pointer **data and the individual strings
+					must be freed.
+	NULL:			If file not found, empty, or has uenxpected format;
+					and if memory allocation error occurs.
+*/
+char **
+GenFromTxt(const char *path, size_t *shape, const size_t maxSize, 
+			const char delim, const char comment)
+{
+	//Initialise shape to 0
+	shape[0] = 0;
+	shape[1] = 0;
+
+	//Counting rows
+	size_t lineCount = CountTxtLines(maxSize, path, &comment);
+	if(lineCount == 0)
+		return (NULL);
+
+	//Initializing pointer to array of lines
+	char lines[lineCount][maxSize];
+	char *lptr[lineCount];
+	for(size_t i=0; i<lineCount; i++)
+		lptr[i] = &(lines[i][0]);
+	char **l = &(lptr[0]);
+
+	//Reading lines
+	ReadTxtLines(l, maxSize, path, &comment);
+
+	//Removing final newline characters
+	for(size_t i=0; i<lineCount; i++)
+		strslc(l[i], 0, strlen(l[i])-2);
+
+	//Read delimiters from each line to confirm
+	//expected number of tokens
+	size_t tokens[lineCount];
+	for(size_t i=0; i<lineCount; i++){
+		tokens[i] = strtokn(l[i], &delim);
+	}
+
+	//Compare all tokens to first one
+	size_t initToken = tokens[0];
+	for(size_t i=0; i<lineCount; i++){
+		if (tokens[i] != initToken){
+			fprintf(stderr, " Error: wrong number of columns at line %d\n", (int) i);
+			return (NULL);
+		}
+	}
+
+	//Allocate array of strings
+	size_t bytes = lineCount*initToken*sizeof(char*);
+	char **m = malloc(bytes);
+	if(!m){
+		fprintf(stderr, " Error: failed to allocate %Iu bytes\n", bytes);
+		return (NULL);
+	}
+
+	//Allocate individual strings
+	int allocFail = (-1);
+	for(size_t i=0; i<(lineCount*initToken); i++){
+		m[i] = malloc(maxSize*sizeof(char));
+		if(!m){
+			allocFail = (int)i;
+			fprintf(stderr, " Error: failed to allocate %Iu bytes\n", maxSize*sizeof(char));
+			break;
+		}
+	}
+
+	//If failed to allocate a string, free those already allocated
+	if(allocFail >= 0){
+		for(int i=0; i<allocFail; i++)
+			free(m[i]);
+		free(m);
+		return(NULL);
+	}
+
+	//Tokenize
+	for(size_t i=0; i<(lineCount); i++){
+		//Split lines
+		char *ptr = l[i];
+		size_t c = 0;
+		char *p[initToken];
+		while( ptr != NULL ){
+			p[c] = ptr;
+			c++;
+			ptr = strpar(ptr, delim);
+		}
+		//Save in allocated memory
+		for(size_t j=0; j<(initToken); j++)
+			strcpy(m[j+i*initToken],p[j]);
+	}
+	
+	//Save shape in input pointer
+	shape[0] = lineCount;
+	shape[1] = initToken;
+
+	return (m);
+}
+
+
+
+//int SaveToTxt(const char **data, size_t *shape, char *filename)
+
+
+//array of doubles into strings
+//array of ints into strings

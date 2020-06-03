@@ -42,14 +42,21 @@ void ret_val = xfree(void *ptr)
 
 ## Strings
 
+*String copying (allocated)*
+Copies an input string into allocated memory,
+and returns a pointer to it.
+Note that it must be freed afterwards.
+```c
+char *strcpyA(const char *str)
+```
+
 *String slicing*.
 Slices a string at two input points *i* and *j*,
 keeping the characters at both indices.
 Returns pointer to sliced string.
 On fail, it returns a NULL pointer.
-
 ```c	
-char *str = strslc(char *s, size_t i, size_t j)
+char *strslc(char *s, size_t i, size_t j)
 ```
 
 *String reversing*.
@@ -58,7 +65,7 @@ Returns pointer to reversed string.
 On fail, it returns a NULL pointer.
 
 ```c
-char *str = strrev(char *s)
+char *strrev(char *s)
 ```
 
 ## 1D Integer Arrays
@@ -70,7 +77,7 @@ It returns the pointer on success,
 and NULL otherwise.
 
 ```c
-int *arr = intzeros(int *a, size_t size)
+int *intzeros(int *a, size_t size)
 ```
 
 *Array of zeros (allocated)*.
@@ -79,7 +86,7 @@ It returns a pointer to the allocated array.
 Note that it must be freed after its use.
 
 ```c
-int *arr = a_intzeros(size_t size)
+int *intzerosA(size_t size)
 ```
 
 *Array of ones*.
@@ -89,7 +96,7 @@ It returns the pointer on success,
 and NULL otherwise.
 
 ```c
-int *arr = intones(int *a, size_t size)
+int *intones(int *a, size_t size)
 ```
 
 *Array of ones (allocated)*.
@@ -98,7 +105,7 @@ It returns a pointer to the allocated array.
 Note that it must be freed after its use.
 
 ```c
-int *arr = a_intones(size_t size)
+int *intonesA(size_t size)
 ```
 
 *Array of same values*.
@@ -108,7 +115,7 @@ It returns the pointer on success,
 and NULL otherwise.
 
 ```c
-int *arr = intval(int *a, size_t size, int value)
+int *intval(int *a, size_t size, int value)
 ```
 
 *Array of same values (allocated)*.
@@ -117,7 +124,7 @@ It returns a pointer to the allocated array.
 Note that it must be freed after its use.
 
 ```c
-int *arr = a_intval(size_t size, int value)
+int *intvalA(size_t size, int value)
 ```
 
 *Array of values in range*.
@@ -129,7 +136,7 @@ It returns the pointer on success,
 and NULL otherwise.
 
 ```c
-int *arr = intrange(int *a, size_t size, int start, int step)
+int *intrange(int *a, size_t size, int start, int step)
 ```
 
 *Array of values in range (allocated)*.
@@ -139,7 +146,7 @@ starting value 'start' and a step size 'step'.
 It returns a pointer to the allocated array.
 Note that it must be freed after its use.
 ```c
-int *arr = a_intrange(size_t size, int start, int step)
+int *intrangeA(size_t size, int start, int step)
 ```
 
 *Print integer array*.
@@ -148,7 +155,7 @@ to stdout horizontally,
 with values separated by single spaces.
 
 ```c
-intprint(const int *a, size_t size)
+void intprint(const int *a, size_t size)
 ```
 
 *Concatenate two arrays*.
@@ -157,7 +164,7 @@ into an input array 'dest'.
 On fail, it returns a NULL pointer.
 
 ```c
-int *arr = intcat(int *dest, const int *a, size_t as, const int *b, size_t bs)
+int *intcat(int *dest, const int *a, size_t as, const int *b, size_t bs)
 ```
 
 *Concatenate two arrays (allocated)*.
@@ -167,7 +174,7 @@ and a pointer to it is returned.
 Note that it must be freed after its use.
 
 ```c
-int *arr = a_intcat(const int *a, size_t as, const int *b, size_t bs)
+int *intcatA(const int *a, size_t as, const int *b, size_t bs)
 ```
 
 *Copy an array*.
@@ -176,7 +183,7 @@ and returns a pointer ot it.
 On fail, it returns a NULL pointer.
 
 ```c
-int *arr = intcpy(int *dest, const int *src, size_t s)
+int *intcpy(int *dest, const int *src, size_t s)
 ```
 
 *Copy an array (allocated)*.
@@ -185,7 +192,7 @@ allocated array, and a pointer to it is returned.
 Note that it must be freed after its use.
 
 ```c
-int *arr = a_intcpy(const int *src, size_t s)
+int *intcpyA(const int *src, size_t s)
 ```
 
 *Reverse an array*.
@@ -195,60 +202,60 @@ It returns a pointer to the input array.
 On fail, it returns the NULL pointer.
 
 ```c
-int *arr = intrev(int *arr, size_t s)
+int *intrev(int *arr, size_t s)
 ```
 
 *Find maximum*.
 Finds the maximum value in an array,
 and returns the value.
 ```c
-int max = intmax(const int *arr, size_t len)
+int intmax(const int *arr, size_t len)
 ```
 
 *Find index of maximum*.
 Finds the maximum value in an array,
 and returns its index in the array.
 ```c
-size_t imax = intimax(const int *arr, size_t len)
+size_t intimax(const int *arr, size_t len)
 ```
 
 *Find minimum*.
 Finds the minimum value in an array,
 and returns the value.
 ```c
-int min = intmin(const int *arr, size_t len)
+int intmin(const int *arr, size_t len)
 ```
 
 *Find index of minimum*.
 Finds the minimum value in an array,
 and returns its index in the array.
 ```c
-size_t imin = intimin(const int *arr, size_t len)
+size_t intimin(const int *arr, size_t len)
 ```
 
 *Sum array members*.
 Sums array members and returns the result.
 ```c
-size_t sum = intsum(const int *arr, size_t len)
+size_t intsum(const int *arr, size_t len)
 ```
 
 *Make array members positive*.
 Changes the sign of all array members to positive.
 ```c
-int *arr = intpos(int *arr, size_t len)
+int *intpos(int *arr, size_t len)
 ```
 
 *Make array members negative*.
 Changes the sign of all array members to negative.
 ```c
-int *arr = intneg(int *arr, size_t len)
+int *intneg(int *arr, size_t len)
 ```
 
 *Switch sign of array*.
 Switches the sign of array members to positive if it
 was negative, and viceversa.
 ```c
-int *arr = intsign(int *arr, size_t len)
+int *intsign(int *arr, size_t len)
 ```
 
 *Roll array elements*.
@@ -256,7 +263,7 @@ Moves the position of all array members
 an input number of steps forward (positive offset)
 of backward (negative offset).
 ```c
-int *arr ±= introll(int *arr, size_t len, int offset)
+int *introll(int *arr, size_t len, int offset)
 ```
 
 *Delete array element*.
@@ -264,7 +271,7 @@ Removes element of given index from array,
 and returns a pointer to it.
 Note that memory of array is not reduced.
 ```c
-int *arr = intdel(int *arr, size_t len, size_t index)
+int *intdel(int *arr, size_t len, size_t index)
 ```
 
 *Insert array element*.
@@ -274,7 +281,7 @@ The result is stored in an input array 'dest'
 and a pointer to it is returned.
 Note: 'dest' must have enough memory for an extra element.
 ```c
-int *dest = intins(int *dest, const int *arr, size_t len, size_t index, int val)
+int *intins(int *dest, const int *arr, size_t len, size_t index, int val)
 ```
 
 *Insert array element (allocated)*.
@@ -284,28 +291,28 @@ The result is allocated into an array of size 'len+1'
 and a pointer to it is returned.
 Note: the return array must be freed after its use.
 ```c
-int *dest = a_intins(const int *arr, size_t len, size_t index, int val)
+int *intinsA(const int *arr, size_t len, size_t index, int val)
 ```
 
 *Add two arrays*.
 Adds the elements of two arrays of equal length to
 each other, and returns a pointer to the first array.
 ```c
-int *dest = intadd(int *dest, const int *arr, size_t len)
+int *intadd(int *dest, const int *arr, size_t len)
 ```
 
 *Subtract two arrays*.
 Subtracts the elements of two arrays of equal length, 
 and returns a pointer to the first array.
 ```c
-int *dest = intsub(int *dest, const int *arr, size_t len)
+int *intsub(int *dest, const int *arr, size_t len)
 ```
 
 *Multiply two arrays*.
 Multiplies the elements of two arrays of equal length
 to one another, and returns a pointer to the first array.
 ```c
-int *dest = intmult(int *dest, const int *arr, size_t len)
+int *intmult(int *dest, const int *arr, size_t len)
 ```
 
 *Applies input function to array members*.
@@ -314,32 +321,32 @@ the single argument. The function must return an int type.
 The return values of the function are saved in the memory
 of the input array, and a pointer to it is returned.
 ```c
-int *arr = intfunc(int (*func)(), int *arr, size_t len)
+int *intfunc(int (*func)(), int *arr, size_t len)
 ```
 
 *Compare two arrays*.
 Compares two arrays 'a' and 'b' and returns a value that
-is zero if a==b, positive if a>b, and negative if a < b.
+is zero only if a==b.
 ```c
-int ret_val = intcmp( const double *a, const double *b, size_t len)
+int intcmp( const double *a, const double *b, size_t len)
 ```
 
 *Add scalar to array*.
 Adds the value of an integer scalar to all array elements.
 ```c
-int *arr = intsadd(int *arr, size_t len, int val)
+int *intsadd(int *arr, size_t len, int val)
 ```
 
 *Multiply array by scalar*.
 Multiplies each array element by an integer scalar.
 ```c
-int *arr = intsmult(int *arr, size_t len, int val)
+int *intsmult(int *arr, size_t len, int val)
 ```
 
 *Dot product of vector*.
 Performs dot product of two arrays and returns the value.
 ```c
-int ret_val = intdot(const int *a, const int *b, size_t len)
+int intdot(const int *a, const int *b, size_t len)
 ```
 
 
@@ -354,7 +361,7 @@ It returns the pointer on success,
 and NULL otherwise.
 
 ```c
-double *arr = fltzeros(double *arr, size_t size)
+double *fltzeros(double *arr, size_t size)
 ```
 
 *Array of zeros (allocated)*.
@@ -363,7 +370,7 @@ It returns a pointer to the allocated array.
 Note that it must be freed after its use.
 
 ```c
-double *arr = a_fltzeros(size_t size)
+double *fltzerosA(size_t size)
 ```
 
 *Array of ones*.
@@ -373,7 +380,7 @@ It returns the pointer on success,
 and NULL otherwise.
 
 ```c
-double *arr = fltones(double *a, size_t size)
+double *fltones(double *a, size_t size)
 ```
 
 *Array of ones (allocated)*.
@@ -382,7 +389,7 @@ It returns a pointer to the allocated array.
 Note that it must be freed after its use.
 
 ```c
-double *arr = a_fltones(size_t size)
+double *fltonesA(size_t size)
 ```
 
 *Array of same values*.
@@ -392,7 +399,7 @@ It returns the pointer on success,
 and NULL otherwise.
 
 ```c
-double *arr = fltval(double *a, size_t size, double value)
+double *fltval(double *a, size_t size, double value)
 ```
 
 *Array of same values (allocated)*.
@@ -401,7 +408,7 @@ It returns a pointer to the allocated array.
 Note that it must be freed after its use.
 
 ```c
-double *arr = a_fltval(size_t size, double value)
+double *fltvalA(size_t size, double value)
 ```
 
 *Array of values in range*.
@@ -413,7 +420,7 @@ It returns the pointer on success,
 and NULL otherwise.
 
 ```c
-double *arr = fltrange(double *a, size_t size, double start, double step)
+double *fltrange(double *a, size_t size, double start, double step)
 ```
 
 *Array of values in range (allocated)*.
@@ -423,7 +430,7 @@ starting value 'start' and a step size 'step'.
 It returns a pointer to the allocated array.
 Note that it must be freed after its use.
 ```c
-double *arr = a_fltrange(size_t size, double start, double step)
+double *fltrangeA(size_t size, double start, double step)
 ```
 
 *Print integer array*.
@@ -431,7 +438,7 @@ Prints a 1D array of integers
 to stdout horizontally, 
 with values separated by single spaces.
 ```c
-intprint(const double *a, size_t size)
+void intprint(const double *a, size_t size)
 ```
 
 *Concatenate two arrays*.
@@ -439,7 +446,7 @@ Concatenates two arrays of integers
 into an input array 'dest'.
 On fail, it returns a NULL pointer.
 ```c
-double *arr = fltcat(double *dest, const double *a, size_t as, const double *b, size_t bs)
+double *fltcat(double *dest, const double *a, size_t as, const double *b, size_t bs)
 ```
 
 *Concatenate two arrays (allocated)*.
@@ -449,7 +456,7 @@ and a pointer to it is returned.
 Note that it must be freed after its use.
 
 ```c
-double *arr = a_fltcat(const double *a, size_t as, const double *b, size_t bs)
+double *fltcatA(const double *a, size_t as, const double *b, size_t bs)
 ```
 
 *Copy an array*.
@@ -458,7 +465,7 @@ and returns a pointer ot it.
 On fail, it returns a NULL pointer.
 
 ```c
-double *dest = fltcpy(double *dest, const double *src, size_t s)
+double *fltcpy(double *dest, const double *src, size_t s)
 ```
 
 *Copy an array (allocated)*.
@@ -467,7 +474,7 @@ allocated array, and a pointer to it is returned.
 Note that it must be freed after its use.
 
 ```c
-double *arr = a_fltcpy(const double *src, size_t s)
+double *fltcpyA(const double *src, size_t s)
 ```
 
 *Reverse an array*.
@@ -477,60 +484,60 @@ It returns a pointer to the input array.
 On fail, it returns the NULL pointer.
 
 ```c
-double *arr = fltrev(double *arr, size_t s)
+double *fltrev(double *arr, size_t s)
 ```
 
 *Find maximum*.
 Finds the maximum value in an array,
 and returns the value.
 ```c
-double max = fltmax(const double *arr, size_t len)
+double fltmax(const double *arr, size_t len)
 ```
 
 *Find index of maximum*.
 Finds the maximum value in an array,
 and returns its index in the array.
 ```c
-size_t imax = fltimax(const double *arr, size_t len)
+size_t fltimax(const double *arr, size_t len)
 ```
 
 *Find minimum*.
 Finds the minimum value in an array,
 and returns the value.
 ```c
-double min = fltmin(const double *arr, size_t len)
+double fltmin(const double *arr, size_t len)
 ```
 
 *Find index of minimum*.
 Finds the minimum value in an array,
 and returns its index in the array.
 ```c
-size_t imin = fltimin(const double *arr, size_t len)
+size_t fltimin(const double *arr, size_t len)
 ```
 
 *Sum array members*.
 Sums array members and returns the result.
 ```c
-size_t sum = fltsum(const double *arr, size_t len)
+size_t fltsum(const double *arr, size_t len)
 ```
 
 *Make array members positive*.
 Changes the sign of all array members to positive.
 ```c
-double *arr = fltpos(double *arr, size_t len)
+double *fltpos(double *arr, size_t len)
 ```
 
 *Make array members negative*.
 Changes the sign of all array members to negative.
 ```c
-double *arr = fltneg(double *arr, size_t len)
+double *fltneg(double *arr, size_t len)
 ```
 
 *Switch sign of array*.
 Switches the sign of array members to positive if it
 was negative, and viceversa.
 ```c
-double *arr = fltsign(double *arr, size_t len)
+double *fltsign(double *arr, size_t len)
 ```
 
 *Roll array elements*.
@@ -538,7 +545,7 @@ Moves the position of all array members
 an input number of steps forward (positive offset)
 of backward (negative offset).
 ```c
-double *arr = fltroll(double *arr, size_t len, int offset)
+double *fltroll(double *arr, size_t len, int offset)
 ```
 
 *Delete array element*.
@@ -546,7 +553,7 @@ Removes element of given index from array,
 and returns a pointer to it.
 Note that memory of array is not reduced.
 ```c
-double *arr = fltdel(double *arr, size_t len, size_t index)
+double *fltdel(double *arr, size_t len, size_t index)
 ```
 
 *Insert array element*.
@@ -556,7 +563,7 @@ The result is stored in an input array 'dest'
 and a pointer to it is returned.
 Note: 'dest' must have enough memory for an extra element.
 ```c
-double *dest = fltins(double *dest, const double *arr, size_t len, size_t index, double val)
+double *fltins(double *dest, const double *arr, size_t len, size_t index, double val)
 ```
 
 *Insert array element (allocated)*.
@@ -566,28 +573,28 @@ The result is allocated into an array of size 'len+1'
 and a pointer to it is returned.
 Note: the return array must be freed after its use.
 ```c
-double *dest = a_fltins(const double *arr, size_t len, size_t index, double val)
+double *fltinsA(const double *arr, size_t len, size_t index, double val)
 ```
 
 *Add two arrays*.
 Adds the elements of two arrays of equal length to
 each other, and returns a pointer to the first array.
 ```c
-double *dest = fltadd(double *dest, const double *arr, size_t len)
+double *fltadd(double *dest, const double *arr, size_t len)
 ```
 
 *Subtract two arrays*.
 Subtracts the elements of two arrays of equal length, 
 and returns a pointer to the first array.
 ```c
-double *dest = fltsub(double *dest, const double *arr, size_t len)
+double *fltsub(double *dest, const double *arr, size_t len)
 ```
 
 *Multiply two arrays*.
 Multiplies the elements of two arrays of equal length
 to one another, and returns a pointer to the first array.
 ```c
-double *dest = fltmult(double *dest, const double *arr, size_t len)
+double *fltmult(double *dest, const double *arr, size_t len)
 ```
 
 *Applies input function to array members*.
@@ -596,87 +603,87 @@ the single argument. The function must return an int type.
 The return values of the function are saved in the memory
 of the input array, and a pointer to it is returned.
 ```c
-double *arr = fltfunc(double (*func)(), double *arr, size_t len)
+double *fltfunc(double (*func)(), double *arr, size_t len)
 ```
 
 *Compare two arrays*.
 Compares two arrays 'a' and 'b' and returns a value that
-is zero if a==b, positive if a>b, and negative if a < b.
+is zero only if a==b.
 ```c
-double ret_val = fltcmp(const double *a, const double *b, size_t len)
+double fltcmp(const double *a, const double *b, size_t len)
 ```
 
 *Add scalar to array*.
 Adds the value of an integer scalar to all array elements.
 ```c
-double *arr = fltsadd(double *arr, size_t len, double val)
+double *fltsadd(double *arr, size_t len, double val)
 ```
 
 *Multiply array by scalar*.
 Multiplies each array element by an integer scalar.
 ```c
-double *arr = fltsmult(double *arr, size_t len, double val)
+double *fltsmult(double *arr, size_t len, double val)
 ```
 
 *Inverse of array elements*.
 Calculates the inverse value 1/x of each array element.
 ```c
-double *arr = fltinv(double *arr, size_t len)
+double *fltinv(double *arr, size_t len)
 ```
 
 *Dot product of vector*.
 Performs dot product of two arrays and returns the value.
 ```c
-double ret_val = fltdot(const double *a, const double *b, size_t len)
+double fltdot(const double *a, const double *b, size_t len)
 ```
 
 *Calculates exp() of array elements*.
 ```c
-double *arr = fltexp(double *arr, size_t len)
+double *fltexp(double *arr, size_t len)
 ```
 
 *Calculates square root of array elements*.
 ```c
-double *arr = fltsqrt(double *arr, size_t len)
+double *fltsqrt(double *arr, size_t len)
 ```
 
 *Calculates sine of array elements*.
 ```c
-double *arr = fltsin(double *arr, size_t len)
+double *fltsin(double *arr, size_t len)
 ```
 
 *Calculates cosine of array elements*.
 ```c
-double *arr = fltcos(double *arr, size_t len)
+double *fltcos(double *arr, size_t len)
 ```
 
 *Calculates natural log of array elements*.
 ```c
-double *arr = fltlog(double *arr, size_t len)
+double *fltlog(double *arr, size_t len)
 ```
 
 *Calculates base 10 log of array elements*.
 ```c
-double *arr = fltlog10(double *arr, size_t len)
+double *fltlog10(double *arr, size_t len)
 ```
 
 *Get magnitude of array vector*.
 ```c
-double ret_val = fltmag(const double *arr, size_t len)
+double fltmag(const double *arr, size_t len)
 ```
 
 *Find if array member is a value*.
 Returns array of 0s and 1s, where 0 is not value, and 1 is value.
 Note that return array must have enough memory.
 ```c
-int *arr = fltisval(int *dest, const double *arr, size_t len, double val)
+int *fltisval(int *dest, const double *arr, size_t len, double val)
 ```
 
 *Looks for NaN values in array*.
 Returns array of 0s and 1s.
 Note that return array must have enough memory.
 ```c
-int *arr = fltisnan(int *dest, const double *arr, size_t len)
+int *fltisnan(int *dest, const double *arr, size_t len)
 ```
 
 
@@ -686,31 +693,132 @@ int *arr = fltisnan(int *dest, const double *arr, size_t len)
 Casts an array of integers into doubles values, 
 and returns a pointer to it.
 ```c
-double *arr = inttoflt(double *dest, const int *arr, size_t len)
+double *inttoflt(double *dest, const int *arr, size_t len)
 ```
 
 *Converts an array of integers into an array of doubles*.
 allocates the new array, and returns a pointer to it.
 ```c
-double *arr = a_inttoflt(const int *arr, size_t len)
+double *inttofltA(const int *arr, size_t len)
 ```
 
 *Convert array of doubles into integers*.
 Casts an array of doubles into integer values, 
 and returns a pointer to it.
 ```c
-int *arr = flttoint(int *dest, const double *arr, size_t len)
+int *flttoint(int *dest, const double *arr, size_t len)
 ```
 
 *Convert array of doubles into integers*.
 Casts an array of doubles into integer values, 
 allocates the new array, and returns a pointer to it.
 ```c
-int *arr = a_flttoint(const double *arr, size_t len)
+int *flttointA(const double *arr, size_t len)
 ```
 
 
+## Input / Output
+
+*Input string*
+Prompts the user to input a string using an input message
+'msg'. The result is stored in the location of 'dest'
+and a pointer is returned to it.
+On fail, it returns NULL.
+```c
+char *getstr(char *dest, const char *msg)
+```
+
+*String to integer*
+Converts an input string 'str' into an integer,
+stores the result in the location of 'dest'
+and returns the pointer.
+On fail, it returns NULL.
+```c
+int *strtoint(int *dest, const char *str)
+```
+
+*String to double*
+Converts an input string 'str' into a double,
+stores the result in the location of 'dest'
+and returns the pointer.
+On fail, it returns NULL.
+```c
+double *strtoflt(double *dest, const char *str)
+```
+
+*Count tokens in string*
+Given a string and a delimiter,
+it returns the number of tokens in the string,
+For example, for a string "aa;bb;cc" and a delimiter ";",
+this function returns '3', since there are three tokens
+in the string ('aa', 'bb', 'cc').
+On fail, it returns zero.
+```c
+size_t strtokn(char *str, const char *delim)
+```
+
+*Partition string*
+Given an input pointer to a string 'ptr'
+and a delimiter 'delim', it searches for the first instance
+of the delimiter, subtitutes it with the terminator character '\0',
+and returns a pointer to the subsequent location (ptr+1). 
+```c
+char *strpar(char *ptr, const char *delim)
+```
+
+*Split string*
+Given a string 'str' and a delimiter 'delim',
+it splits the string at the delimiters, stores
+the pointers to the tokens in 'dest', and returns
+a pointer to it.
+On fail, it returns NULL.
+```c
+char **strsplit(char **dest, char *str, const char delim)
+```
+
+*Count lines in a file*
+Counts the lines in a text file located at the path 'path', 
+and returns the value. The counting process discards empty lines
+and comment lines, defined by an input starting character 'comment'.
+```c
+size_t
+CountTxtLines(size_t maxRead, const char *path, const char *comment)
+```
+
+*Read lines in a file*
+
+Reads the lines in a file, skipping the empty ones and the comments, as defined by a comment character 'comment'. The lines are stored as strings at the input array of strings '\*\*lines' and a pointer to it is returned. The maximum memory in which to copy read lines is defined by 'maxRead'. On fail, a NULL pointer is returned.
+```c
+char **ReadTxtLines(char **lines, size_t maxRead, const char *path, const char *comment)
+```
+
+*Load data from file*
+
+Automatically reads data from an input file at location 'path'. The data is expected to be organised in rows and columns, in which columns are separated by a delimiter character 'delim', and individual lines are stored in memory with maximum size 'maxSize'. Comments starting with input character 'comment' are skipped. The size of the data to read is stored in input array 'shape' of two members, storing the number of rows and the number of columns.
+```c
+char **GenFromTxt(const char *path, size_t *shape, const size_t maxSize, const char delim, const char comment)
+```
+
+For example, there is a file 'data.txt' in the same directory, with the contents:
+```c
+# This is a comment
+star_name;parallax;Vmag;Vmag_error
+HR_8799;1.15;15;0.3
+HIP_23585;2.87;18;0.7
+```
+Here, the data delimiter is set as semicolon ';', the comment character is set as a hash '#' and the max length in which to store a line is set to '100'. An array of two integers 'shape[2]' is initialised to store the number of rows and columns of the data, and a pointer to it is passed to the function.
+
+The function will return a pointer 'data' to allocated memory. Each data field in the file is accessed via 'data[row\*columns + col]', where 'row' and 'col' are the current row and column of the data point, and 'columns' is the total number of columns. The size of the data matrix, that is number of rows and columns, is saved at the input integer array 'shape[0]' and 'shape[1]', respectively.
+
+Once the data is not necessary, it must be freed by first iterating through every individual string and freeing it, and then freeing the main pointer '\*\*data'.
+
+
+
 ### *WIP*.
+* SaveToTxt
+* Array of integers into strings
+* Array of doubles into strings
+
 * Sort array in ascending/descending order (use qsort).
 * Sort and return array of indices (argsort).
  
