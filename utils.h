@@ -1,4 +1,5 @@
-
+#ifndef _UTILS_HEADER_1
+#define _UTILS_HEADER_1
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -71,6 +72,9 @@
 			getstr, strtoint, strtointArr, strtoflt, strtofltArr,
 			CountTxtLines, ReadTxtLines, GenFromTxt
 		Renamed all allocated functions from 'a_funcname' to 'funcnameA'.
+
+	1.6 - 23/06/2020
+		Split main file into utils.h header and utils.c.
 		
 
 
@@ -89,12 +93,6 @@
 
 
 /*
-	DATA TYPES
-*/
-typedef unsigned int uint;
-
-
-/*
 	MEMORY
 */
 /*
@@ -103,36 +101,14 @@ and returns a pointer ot it.
 On fail, it exits the program.
 */
 void *
-xmalloc(size_t bytes)
-{
-	if (bytes == 0){
-		fprintf(stderr, " Error: can't allocate 0 bytes\n");
-		exit(-1);
-		return (NULL);
-	}
-    void *ptr = malloc(bytes);
-    if (ptr)
-        return ptr;
-
-    fprintf(stderr, " Error: can't allocate %ld bytes\n", (long)bytes);
-    exit(-1);
-	return (NULL);
-}
+xmalloc(size_t bytes);
 
 /*
 Checks if pointer points to allocated memory
 before freeing it.
 */
 int
-xfree(void *ptr)
-{
-	if (ptr){
-		free(ptr);
-		return 0;
-	}
-	fprintf(stderr, " Error: failed to free pointer");
-	return (-1);
-}
+xfree(void *ptr);
 
 
 
@@ -146,19 +122,7 @@ and returns a pointer to it.
 Note: free the string once it has been used.
 */
 char *
-strcpyA(const char *str)
-{
-	if(!str)
-		return (NULL);
-	char *t = malloc((strlen(str)+1)*sizeof(char));
-	if(!t){
-		size_t bytes = strlen(str)*sizeof(char);
-		fprintf(stderr, " Error: failed to allocate %Iu bytes\n", bytes);
-		return (NULL);
-	}
-	strcpy(t, str);
-	return t;
-}
+strcpyA(const char *str);
 
 
 /*
@@ -168,22 +132,7 @@ Note that it modifies the input string.
 On fail, it returns a null pointer.
 */
 char *
-strslc(char *s, size_t i, size_t j)
-{
-	/* Input checks */
-	if( (i>j) || strlen(s)<(j-i+1) )
-		return (NULL);
-
-	/* Move pointer to left slice */
-	char *ptr;
-	ptr = s + i;
-
-	/* Null terminator after right slice */
-	ptr[j-i+1] = '\0';
-	
-	s = ptr;
-	return s;
-}
+strslc(char *s, size_t i, size_t j);
 
 
 /*
@@ -193,51 +142,12 @@ leaving the original string untouched.
 On fail, it returns a null pointer.
 */
 char *
-strslc2(char *dest, const char *str, size_t i, size_t j)
-{
-	/* Input checks */
-	if( (i>j) || strlen(str)<(j-i+1) )
-		return (NULL);
-
-	//Make temporal string to slice
-	char temp[strlen(str)];
-	char *t = &(temp[0]);
-	strcpy(t, str);
-
-	/* Move pointer to left slice */
-	char *ptr;
-	ptr = t + i;
-
-	/* Null terminator after right slice */
-	ptr[j-i+1] = '\0';
-
-	strcpy(dest, ptr);
-	return dest;
-}
+strslc2(char *dest, const char *str, size_t i, size_t j);
 
 
 /* Reverses input string */
 char *
-strrev(char *s)
-{
-	/*Check input */
-	if(!s)
-		return (NULL);
-
-	/* Declaring temporary space to save string */
-	uint len = strlen(s);
-	char buffer[len];
-
-	/* Copying original string */
-	strcpy(buffer, s);
-
-	/* Reversing string from buffer */
-	for(size_t i=0; i<len; i++)
-		s[i] = buffer[len-i-1];
-
-	return s;
-}
-
+strrev(char *s);
 
 
 
@@ -248,105 +158,49 @@ strrev(char *s)
 
 /* Generates an array of a given value */
 int *
-intval(int * arr, size_t s, int val)
-{
-	for(size_t i=0; i<s; i++)
-		arr[i] = val;
-	return arr;
-}
+intval(int * arr, size_t s, int val);
 
 /* Generates an array of a given value */
 int *
-intvalA(size_t s, int val)
-{
-	int *arr = malloc(s*sizeof(int));
-	if(!arr)
-		return (NULL);
-	intval(arr, s, val);
-	return arr;
-}
+intvalA(size_t s, int val);
 
 /* Generates an array of zeros */
 int *
-intzeros(int *arr, size_t s)
-{
-	intval(arr, s, 0);
-	return arr;
-}
+intzeros(int *arr, size_t s);
 
 /*
 Allocates and generates an array of zeros.
 You will need to free the pointer afterwards manually.
 */
 int *
-intzerosA(size_t s)
-{
-	int *arr = intvalA(s, 0);
-	return arr;
-}
+intzerosA(size_t s);
 
 /* Generates an array of ones */
 int *
-intones(int *arr, size_t s)
-{
-	intval(arr, s, 1);
-	return arr;
-}
+intones(int *arr, size_t s);
 
 /*
 Allocates and generates an array of ones.
 You will need to free the pointer afterwards manually.
 */
 int *
-intonesA(size_t s)
-{
-	int *arr = intvalA(s, 1);
-	return arr;
-}
+intonesA(size_t s);
 
 /* Generates an array of values in a range */
 int *
 intrange(int *arr, size_t s, 
-		int start, int step)
-{
-	int val = start;
-	for(size_t i=0; i<s; i++){
-		arr[i] = val;
-		val += step;
-	}
-	return arr;
-}
+		int start, int step);
 
 /*
 Allocates and generates an array of values in a range.
 You will need to free the pointer afterwards.
 */
 int *
-intrangeA(size_t s, int start, int step)
-{
-	/*Allocating pointer*/
-	int *arr = (int *) malloc(s*sizeof(int));
-	if(!arr)
-		return (NULL);
-	/*Evaluating array*/
-	int val = start;
-	for(size_t i=0; i<s; i++){
-		arr[i] = val;
-		val += step;
-	}
-	return arr;
-}
+intrangeA(size_t s, int start, int step);
 
 /* Copies an array to another */
 int *
-intcpy(int *dest, const int *src, size_t s)
-{
-	if( !dest || !src)
-		return (NULL);
-	for(size_t i=0; i<s; i++)
-		dest[i] = src[i];
-	return dest;
-}
+intcpy(int *dest, const int *src, size_t s);
 
 /*
 Copies an array into another array it allocates,
@@ -354,31 +208,12 @@ and returns a pointer to it.
 You will have to free it afterwards.
 */
 int *
-intcpyA(const int *src, size_t s)
-{
-	if(!src)
-		return (NULL);
-	int *dest = (int *) malloc(s*sizeof(int));
-	if(!dest)
-		return (NULL);
-	intcpy(dest, src, s);
-	return dest;
-}
+intcpyA(const int *src, size_t s);
 
 /* Concatenates two arrays of integers into destination */
 int *
 intcat(int *dest, const int *a, size_t as, 
-		const int *b, size_t bs)
-{
-	/* Check input */
-	if (!dest || !a || !b)
-		return (NULL);
-	/* Append first array */
-	intcpy(dest, a, as);
-	/* Append second array */
-	intcpy(dest+as, b, bs);
-	return dest;
-}
+		const int *b, size_t bs);
 
 /*
 Concatenates two arrays of integers,
@@ -388,211 +223,58 @@ You will have to free it afterwards.
 */
 int *
 intcatA(const int *a, size_t as, 
-		const int *b, size_t bs)
-{
-	/* Check input */
-	if (!a || !b)
-		return (NULL);
-
-	int *dest = (int *) malloc((as+bs)*sizeof(int));
-	if(!dest)
-		return (NULL);
-	intcpy(dest, a, as);
-	intcpy(dest+as, b, bs);
-	return dest;
-}
+		const int *b, size_t bs);
 
 /* Prints an array of integers to stdout */
 void
-intprint(const int *src, size_t s)
-{
-	for(size_t i=0; i<s; i++)
-		printf("%d ", src[i]);
-	printf("\n");
-}
+intprint(const int *src, size_t s);
 
 /* Reverses input array */
 int *
-intrev(int *arr, size_t len)
-{
-	/*Check input */
-	if(arr == NULL)
-		return arr;
-
-	/* Declaring temporary space to save string */
-	int buffer[len];
-	int *b = &(buffer[0]);
-
-	/* Copying original string */
-	intcpy(b, arr, len);
-
-	/* Reversing string from buffer */
-	for(size_t i=0; i<len; i++)
-		arr[i] = buffer[len-i-1];
-
-	return arr;
-}
+intrev(int *arr, size_t len);
 
 
 
 /* 	STATISTICS */
 /* Finds maximum of array */
 int
-intmax(const int *arr, size_t len)
-{
-	/* Initialise max value on first array member */
-	int max = arr[0];
-
-	/* Looping through array */
-	for(size_t i=0; i<len; i++){
-		if( arr[i] > max)
-			max = arr[i];
-	}
-	return max;
-}
+intmax(const int *arr, size_t len);
 
 /* Finds minimum of array */
 int
-intmin(const int *arr, size_t len)
-{
-	/* Initialise min value on first array member */
-	int min = arr[0];
-
-	/* Looping through array */
-	for(size_t i=0; i<len; i++){
-		if( arr[i] < min)
-			min = arr[i];
-	}
-	return min;
-}
+intmin(const int *arr, size_t len);
 
 /* Finds index of maximum of array */
 size_t
-intimax(const int *arr, size_t len)
-{
-	/* Initialise max value and its index */
-	int max = arr[0];
-	size_t imax;
-
-	/* Looping through array */
-	for(size_t i=0; i<len; i++){
-		if( arr[i] > max ){
-			max = arr[i];
-			imax = i;
-		}
-	}
-	return imax;
-}
+intimax(const int *arr, size_t len);
 
 
 /* Finds index of minimum of array */
 size_t
-intimin(const int *arr, size_t len)
-{
-	/* Initialise min value and its index */
-	int min = arr[0];
-	size_t imin = 0;
-
-	/* Looping through array */
-	for(size_t i=0; i<len; i++){
-		if( arr[i] < min ){
-			min = arr[i];
-			imin = i;
-		}
-	}
-	return imin;
-}
+intimin(const int *arr, size_t len);
 
 /* Sums the members of an integer array */
 int
-intsum(const int *arr, size_t len)
-{
-	int sum = 0;
-	for(size_t i=0; i<len; i++)
-		sum += arr[i];
-	return sum;
-}
+intsum(const int *arr, size_t len);
 
 /* Makes all array members positive */
 int *
-intpos(int *arr, size_t len)
-{
-	for(size_t i=0; i<len; i++)
-		arr[i] = abs(arr[i]);
-	return arr;
-}
+intpos(int *arr, size_t len);
 
 /* Makes all array members negative */
 int *
-intneg(int *arr, size_t len)
-{
-	for(size_t i=0; i<len; i++)
-		arr[i] = (-1)*abs(arr[i]);
-	return arr;
-}
+intneg(int *arr, size_t len);
 
 /* Switch the sign of array members */
 int *
-intsign(int *arr, size_t len)
-{
-	for(size_t i=0; i<len; i++){
-		if(arr[i] > 0)
-			arr[i] = -arr[i];
-		else
-			arr[i] = abs(arr[i]);
-	}
-	return arr;
-}
+intsign(int *arr, size_t len);
 
 /*
 Moves array values an input number of places in the array.
 A positive offset moves values forward, and a negative one, backwards.
 */
 int *
-introll(int *arr, size_t len, int offset)
-{
-	if(offset == 0)
-		return arr;
-
-	int buffer[len];
-	int *buff = &(buffer[0]);
-	size_t ind = 0;
-
-	//Simplifying offset
-	while( (size_t)abs(offset) >= len)
-	{
-		if (offset > 0)
-			offset = offset - len;
-		else if (offset < 0)
-			offset = offset + len;
-	}
-
-	//Calculating roll
-	if (offset < 0)
-	{
-		for(size_t i=0; i<len; i++)
-		{
-			ind = i + abs(offset);
-			if ( ind >= len )
-				ind = i + abs(offset) - len;
-			buff[i] = arr[ind];
-		}
-	}
-
-	else if (offset > 0)
-	{
-		for(size_t i=0; i<len; i++)
-		{
-			ind = len + i - offset;
-			if (ind >= len)
-				ind = i - offset;
-			buff[i] = arr[ind];
-		}
-	}
-
-	arr = intcpy(arr, buffer, len);
-	return arr;
-}
+introll(int *arr, size_t len, int offset);
 
 
 /*
@@ -600,14 +282,7 @@ Delete array element specified by input index.
 Note that new length is reduced by one.
 */
 int *
-intdel(int *arr, size_t len, size_t index)
-{
-	if (index >= len)
-		return arr;
-	for(size_t i=index; i<(len-1); i++)
-		arr[i] = arr[i+1];
-	return arr;
-}
+intdel(int *arr, size_t len, size_t index);
 
 
 /*
@@ -617,18 +292,7 @@ Provide enough memory for new element in
 destination array. A pointer to this array is returned.
 */
 int *
-intins(int *dest, const int *arr, size_t len, size_t index, int val)
-{
-	dest = intcpy(dest, arr, len);
-	if (index >= len){
-		dest[len] = val;
-		return dest;
-	}
-	for(size_t i=len; i>index; i--)
-		dest[i] = arr[i-1];
-	dest[index] = val;
-	return dest;
-}
+intins(int *dest, const int *arr, size_t len, size_t index, int val);
 
 /*
 Insert array element of input value at a specified index
@@ -640,14 +304,7 @@ than the size of the previous one, and must be freed
 after its use.
 */
 int *
-intinsA(const int *arr, size_t len, size_t index, int val)
-{
-	int *dest = intzerosA(len+1);
-	if(!dest)
-		return (NULL);
-	intins(dest, arr, len, index, val);
-	return dest;
-}
+intinsA(const int *arr, size_t len, size_t index, int val);
 
 
 //intissort - sorts array and returns list of array indices
@@ -657,81 +314,41 @@ Adds the values of two integer arrays of equal length,
 and the result is saved in the memory of the first array.
 */
 int *
-intadd(int *dest, const int *arr, size_t len)
-{
-	for(size_t i=0; i<len; i++)
-		dest[i] = dest[i] + arr[i];
-	return dest;
-}
+intadd(int *dest, const int *arr, size_t len);
 
 /*
 Subtracts the values of two integer arrays of equal length;
 the result is saved in the memory of the first array.
 */
 int *
-intsub(int *dest, const int *arr, size_t len)
-{
-	for(size_t i=0; i<len; i++)
-		dest[i] = dest[i] - arr[i];
-	return dest;
-}
+intsub(int *dest, const int *arr, size_t len);
 
 //intmult - multiplies members of two arrays
 int *
-intmult(int *dest, const int *arr, size_t len)
-{
-	for(size_t i=0; i<len; i++)
-		dest[i] = dest[i] * arr[i];
-	return dest;
-}
+intmult(int *dest, const int *arr, size_t len);
 
 //intfunc - applies given function to array members
 int *
-intfunc(int (*func)(int), int *arr, size_t len)
-{
-	for(size_t i=0; i<len; i++)
-		arr[i] = (*func)(arr[i]);
-	return arr;
-}
+intfunc(int (*func)(int), int *arr, size_t len);
 
 /*
 Compares two arrays 'a' and 'b' and returns a value that
 is zero if a==b, positive if a>b, and negative if a<b.
 */
 int
-intcmp(const int *a, const int *b, size_t len)
-{
-	int cmp = abs(intsum(a,len)) - abs(intsum(b,len));
-	return cmp;
-}
+intcmp(const int *a, const int *b, size_t len);
 
 //intsadd - add a scalar to all array members.
 int *
-intsadd(int *arr, size_t len, int val)
-{
-	for(size_t i=0; i<len; i++)
-		arr[i] = arr[i] + val;
-	return arr;
-}
+intsadd(int *arr, size_t len, int val);
 
 //intsmult - multiply all array members by a scalar
 int *
-intsmult(int *arr, size_t len, int val)
-{
-	for(size_t i=0; i<len; i++)
-		arr[i] = arr[i]*val;
-	return arr;
-}
+intsmult(int *arr, size_t len, int val);
 
 //intdot - dot product of two arrays
 int
-intdot(const int *a, const int *b, size_t len)
-{
-	int *arr = intcpyA(a, len);
-	int dot = intsum(intmult(arr, b, len), len);
-	free(arr); 
-	return dot;
-}
+intdot(const int *a, const int *b, size_t len);
 
 
 
@@ -745,105 +362,49 @@ intdot(const int *a, const int *b, size_t len)
 
 /* Generates an array of a given value */
 double *
-fltval(double * arr, size_t s, double val)
-{
-	for(size_t i=0; i<s; i++)
-		arr[i] = val;
-	return arr;
-}
+fltval(double * arr, size_t s, double val);
 
 /* Generates an array of a given value */
 double *
-fltvalA(size_t s, double val)
-{
-	double *arr = (double *) malloc(s*sizeof(double));
-	if(!arr)
-		return (NULL);
-	fltval(arr, s, val);
-	return arr;
-}
+fltvalA(size_t s, double val);
 
 /* Generates an array of zeros */
 double *
-fltzeros(double *arr, size_t s)
-{
-	fltval(arr, s, 0);
-	return arr;
-}
+fltzeros(double *arr, size_t s);
 
 /*
 Allocates and generates an array of zeros.
 You will need to free the pointer afterwards manually.
 */
 double *
-fltzerosA(size_t s)
-{
-	double *arr = fltvalA(s, 0);
-	return arr;
-}
+fltzerosA(size_t s);
 
 /* Generates an array of ones */
 double *
-fltones(double *arr, size_t s)
-{
-	fltval(arr, s, 1);
-	return arr;
-}
+fltones(double *arr, size_t s);
 
 /*
 Allocates and generates an array of ones.
 You will need to free the pointer afterwards manually.
 */
 double *
-fltonesA(size_t s)
-{
-	double *arr = fltvalA(s, 1);
-	return arr;
-}
+fltonesA(size_t s);
 
 /* Generates an array of values in a range */
 double *
 fltrange(double *arr, size_t s, 
-		double start, double step)
-{
-	double val = start;
-	for(size_t i=0; i<s; i++){
-		arr[i] = val;
-		val += step;
-	}
-	return arr;
-}
+		double start, double step);
 
 /*
 Allocates and generates an array of values in a range.
 You will need to free the pointer afterwards.
 */
 double *
-fltrangeA(size_t s, double start, double step)
-{
-	/*Allocating pointer*/
-	double *arr = (double *) malloc(s*sizeof(double));
-	if(!arr)
-		return (NULL);
-	/*Evaluating array*/
-	double val = start;
-	for(size_t i=0; i<s; i++){
-		arr[i] = val;
-		val += step;
-	}
-	return arr;
-}
+fltrangeA(size_t s, double start, double step);
 
 /* Copies an array to another */
 double *
-fltcpy(double *dest, const double *src, size_t s)
-{
-	if( !dest || !src)
-		return (NULL);
-	for(size_t i=0; i<s; i++)
-		dest[i] = src[i];
-	return dest;
-}
+fltcpy(double *dest, const double *src, size_t s);
 
 /*
 Copies an array into another array it allocates,
@@ -851,31 +412,12 @@ and returns a pointer to it.
 You will have to free it afterwards.
 */
 double *
-fltcpyA(const double *src, size_t s)
-{
-	if(!src)
-		return (NULL);
-	double *dest = (double *) malloc(s*sizeof(double));
-	if(!dest)
-		return (NULL);
-	fltcpy(dest, src, s);
-	return dest;
-}
+fltcpyA(const double *src, size_t s);
 
 /* Concatenates two arrays of integers into destination */
 double *
 fltcat(double *dest, const double *a, size_t as, 
-		const double *b, size_t bs)
-{
-	/* Check input */
-	if (!dest || !a || !b)
-		return (NULL);
-	/* Append first array */
-	fltcpy(dest, a, as);
-	/* Append second array */
-	fltcpy(dest+as, b, bs);
-	return dest;
-}
+		const double *b, size_t bs);
 
 /*
 Concatenates two arrays of integers,
@@ -885,209 +427,60 @@ You will have to free it afterwards.
 */
 double *
 fltcatA(const double *a, size_t as, 
-		const double *b, size_t bs)
-{
-	/* Check input */
-	if (!a || !b)
-		return (NULL);
+		const double *b, size_t bs);
 
-	double *dest = (double *) malloc((as+bs)*sizeof(double));
-	if(!dest)
-		return (NULL);
-	fltcpy(dest, a, as);
-	fltcpy(dest+as, b, bs);
-	return dest;
-}
 
 /* Prints an array of integers to stdout */
 void
-fltprint(const double *src, size_t s)
-{
-	for(size_t i=0; i<s; i++)
-		printf("%g ", src[i]);
-	printf("\n");
-}
+fltprint(const double *src, size_t s);
+
 
 /* Reverses input array */
 double *
-fltrev(double *arr, size_t len)
-{
-	/*Check input */
-	if(arr == NULL)
-		return arr;
-
-	/* Declaring temporary space to save string */
-	double buffer[len];
-	double *b = &(buffer[0]);
-
-	/* Copying original string */
-	fltcpy(b, arr, len);
-
-	/* Reversing string from buffer */
-	for(size_t i=0; i<len; i++)
-		arr[i] = buffer[len-i-1];
-
-	return arr;
-}
+fltrev(double *arr, size_t len);
 
 
 
 /* 	STATISTICS */
 /* Finds maximum of array */
 double
-fltmax(const double *arr, size_t len)
-{
-	/* Initialise max value on first array member */
-	double max = arr[0];
-	/* Looping through array */
-	for(size_t i=0; i<len; i++){
-		if( arr[i] > max)
-			max = arr[i];
-	}
-	return max;
-}
+fltmax(const double *arr, size_t len);
+
 
 /* Finds minimum of array */
 double
-fltmin(const double *arr, size_t len)
-{
-	/* Initialise min value on first array member */
-	double min = arr[0];
-
-	/* Looping through array */
-	for(size_t i=0; i<len; i++){
-		if( arr[i] < min)
-			min = arr[i];
-	}
-	return min;
-}
+fltmin(const double *arr, size_t len);
 
 /* Finds index of maximum of array */
 size_t
-fltimax(const double *arr, size_t len)
-{
-	/* Initialise max value and its index */
-	double max = arr[0];
-	size_t imax;
-
-	/* Looping through array */
-	for(size_t i=0; i<len; i++){
-		if( arr[i] > max ){
-			max = arr[i];
-			imax = i;
-		}
-	}
-	return imax;
-}
+fltimax(const double *arr, size_t len);
 
 /* Finds index of minimum of array */
 size_t
-fltimin(const double *arr, size_t len)
-{
-	/* Initialise min value and its index */
-	double min = arr[0];
-	size_t imin = 0;
-
-	/* Looping through array */
-	for(size_t i=0; i<len; i++){
-		if( arr[i] < min ){
-			min = arr[i];
-			imin = i;
-		}
-	}
-	return imin;
-}
+fltimin(const double *arr, size_t len);
 
 /* Sums the members of an integer array */
 double
-fltsum(const double *arr, size_t len)
-{
-	double sum = 0;
-	for(size_t i=0; i<len; i++)
-		sum += arr[i];
-	return sum;
-}
+fltsum(const double *arr, size_t len);
 
 /* Makes all array members positive */
 double *
-fltpos(double *arr, size_t len)
-{
-	for(size_t i=0; i<len; i++)
-		arr[i] = fabs(arr[i]);
-	return arr;
-}
+fltpos(double *arr, size_t len);
 
 /* Makes all array members negative */
 double *
-fltneg(double *arr, size_t len)
-{
-	for(size_t i=0; i<len; i++)
-		arr[i] = (-1)*fabs(arr[i]);
-	return arr;
-}
+fltneg(double *arr, size_t len);
 
 /* Switch the sign of array members */
 double *
-fltsign(double *arr, size_t len)
-{
-	for(size_t i=0; i<len; i++){
-		if(arr[i] > 0)
-			arr[i] = -arr[i];
-		else
-			arr[i] = fabs(arr[i]);
-	}
-	return arr;
-}
+fltsign(double *arr, size_t len);
 
 /*
 Moves array values an input number of places in the array.
 A positive offset moves values forward, and a negative one, backwards.
 */
 double *
-fltroll(double *arr, size_t len, int offset)
-{
-	if(offset == 0)
-		return arr;
-
-	double buffer[len];
-	double *buff = &(buffer[0]);
-	size_t ind = 0;
-
-	//Simplifying offset
-	while( (size_t)abs(offset) >= len)
-	{
-		if (offset > 0)
-			offset = offset - len;
-		else if (offset < 0)
-			offset = offset + len;
-	}
-
-	//Calculating roll
-	if (offset < 0)
-	{
-		for(size_t i=0; i<len; i++)
-		{
-			ind = i + abs(offset);
-			if ( ind >= len )
-				ind = i + abs(offset) - len;
-			buff[i] = arr[ind];
-		}
-	}
-
-	else if (offset > 0)
-	{
-		for(size_t i=0; i<len; i++)
-		{
-			ind = len + i - offset;
-			if (ind >= len)
-				ind = i - offset;
-			buff[i] = arr[ind];
-		}
-	}
-
-	arr = fltcpy(arr, buffer, len);
-	return arr;
-}
+fltroll(double *arr, size_t len, int offset);
 
 
 /*
@@ -1097,15 +490,7 @@ Note that 'must' have a size of at least len-1.
 */
 double *
 fltdel(double *dest, const double *arr, 
-			size_t len, size_t index)
-{
-	fltcpy(dest, arr, len-1);
-	if (index >= len)
-		return dest;
-	for(size_t i=index; i<(len-1); i++)
-		dest[i] = arr[i+1];
-	return dest;
-}
+			size_t len, size_t index);
 
 
 /*
@@ -1117,16 +502,7 @@ than the size of the previous one, and must be freed
 after its use.
 */
 double *
-fltdelA(const double *arr, size_t len, size_t index)
-{
-
-	double *dest = fltcpyA(arr, len-1);
-	if (index >= len)
-		return dest;
-	for(size_t i=index; i<(len-1); i++)
-		dest[i] = arr[i+1];
-	return dest;
-}
+fltdelA(const double *arr, size_t len, size_t index);
 
 
 /*
@@ -1137,18 +513,7 @@ destination array. A pointer to this array is returned.
 */
 double *
 fltins(double *dest, const double *arr, 
-		size_t len, size_t index, double val)
-{
-	dest = fltcpy(dest, arr, len);
-	if (index >= len){
-		dest[len] = val;
-		return dest;
-	}
-	for(size_t i=len; i>index; i--)
-		dest[i] = arr[i-1];
-	dest[index] = val;
-	return dest;
-}
+		size_t len, size_t index, double val);
 
 /*
 Insert array element of input value at a specified index
@@ -1160,14 +525,7 @@ than the size of the previous one, and must be freed
 after its use.
 */
 double *
-fltinsA(const double *arr, size_t len, size_t index, double val)
-{
-	double *temp = fltzerosA(len+1);
-	if(!temp)
-		return (NULL);
-	fltins(temp, arr, len, index, val);
-	return temp;
-}
+fltinsA(const double *arr, size_t len, size_t index, double val);
 
 
 //intissort - sorts array and returns list of array indices
@@ -1177,156 +535,81 @@ Adds the values of two integer arrays of equal length,
 and the result is saved in the memory of the first array.
 */
 double *
-fltadd(double *dest, const double *arr, size_t len)
-{
-	for(size_t i=0; i<len; i++)
-		dest[i] = dest[i] + arr[i];
-	return dest;
-}
+fltadd(double *dest, const double *arr, size_t len);
 
 /*
 Subtracts the values of two integer arrays of equal length;
 the result is saved in the memory of the first array.
 */
 double *
-fltsub(double *dest, const double *arr, size_t len)
-{
-	for(size_t i=0; i<len; i++)
-		dest[i] = dest[i] - arr[i];
-	return dest;
-}
+fltsub(double *dest, const double *arr, size_t len);
+
+
 /* Multiplies two arrays element-wise */
 double *
-fltmult(double *dest, const double *arr, size_t len)
-{
-	for(size_t i=0; i<len; i++)
-		dest[i] = dest[i] * arr[i];
-	return dest;
-}
+fltmult(double *dest, const double *arr, size_t len);
+
 
 /* Applies an input function to the array elements individually */
 double *
-fltfunc(double (*func)(), double *arr, size_t len)
-{
-	for(size_t i=0; i<len; i++)
-		arr[i] = (*func)(arr[i]);
-	return arr;
-}
+fltfunc(double (*func)(), double *arr, size_t len);
+
 
 /*
 Compares two arrays 'a' and 'b' and returns a value that
 is zero if a==b, and non-zero if a!=b.
 */
 double
-fltcmp(const double *a, const double *b, size_t len)
-{
-	double temp[len];
-	double *t = &(temp[0]);
-	t = fltcpy(t, a, len);
-	fltsub(t, b, len);
-	double cmp = fltsum(fltpos(t, len), len);
-	return cmp;
-}
+fltcmp(const double *a, const double *b, size_t len);
+
 
 /* Adds a scalar value to all array elements */
 double *
-fltsadd(double *arr, size_t len, double val)
-{
-	for(size_t i=0; i<len; i++)
-		arr[i] = arr[i] + val;
-	return arr;
-}
+fltsadd(double *arr, size_t len, double val);
+
 
 /* Multiplies all array elements by a scalar value */
 double *
-fltsmult(double *arr, size_t len, double val)
-{
-	for(size_t i=0; i<len; i++)
-		arr[i] = arr[i]*val;
-	return arr;
-}
+fltsmult(double *arr, size_t len, double val);
+
 
 /* Calculates inverse of array elements */
 double *
-fltinv(double *arr, size_t len)
-{
-	for(size_t i=0; i<len; i++){
-		arr[i] = pow(arr[i], -1);
-	}
-	return arr;
-}
+fltinv(double *arr, size_t len);
+
 
 /* Calculates exp() of array elements */
 double *
-fltexp(double *arr, size_t len)
-{
-	double (*func_ptr)(double) = &exp;
-	fltfunc(func_ptr, arr, len);
-	return arr; 
-}
+fltexp(double *arr, size_t len);
 
 /* Calculates square root of array elements */
 double *
-fltsqrt(double *arr, size_t len)
-{
-	double (*func_ptr)(double) = &sqrt;
-	fltfunc(func_ptr, arr, len);
-	return arr; 
-}
+fltsqrt(double *arr, size_t len);
 
 /* Calculates sine of array elements */
 double *
-fltsin(double *arr, size_t len)
-{
-	double (*func_ptr)(double) = &sin;
-	fltfunc(func_ptr, arr, len);
-	return arr;
-}
+fltsin(double *arr, size_t len);
 
 /* Calculates cosine of array elements */
 double *
-fltcos(double *arr, size_t len)
-{
-	double (*func_ptr)(double) = &cos;
-	fltfunc(func_ptr, arr, len);
-	return arr; 
-}
+fltcos(double *arr, size_t len);
 
 /* Calculates natural log of array elements */
 double *
-fltlog(double *arr, size_t len)
-{
-	double (*func_ptr)(double) = &log;
-	fltfunc(func_ptr, arr, len);
-	return arr; 
-}
+fltlog(double *arr, size_t len);
 
 /* Calculates base 10 log of array elements */
 double *
-fltlog10(double *arr, size_t len)
-{
-	double (*func_ptr)(double) = &log10;
-	fltfunc(func_ptr, arr, len);
-	return arr; 
-}
+fltlog10(double *arr, size_t len);
 
 /* Calculates dot product of array */
 double
-fltdot(const double *a, const double *b, size_t len)
-{
-	double temp[len];
-	double *t = &(temp[0]); 
-	t = fltcpy(t, a, len);
-	double dot = fltsum(fltmult(t, b, len), len);
-	return dot;
-}
+fltdot(const double *a, const double *b, size_t len);
 
 /* Get magnitude of array vector */
 double
-fltmag(const double *arr, size_t len)
-{
-	return sqrt(fltdot(arr,arr,len));
-}
+fltmag(const double *arr, size_t len);
+
 
 /*
 Find if array member is a value.
@@ -1334,15 +617,7 @@ Returns array of 0s and 1s, where 0 is not value, and 1 is value.
 Note that return array must have enough memory.
 */
 int *
-fltisval(int *dest, const double *arr, size_t len, double val)
-{
-	dest = intzeros(dest, len);
-	for (size_t i=0; i<len; i++){
-		if(arr[i] == val)
-			dest[i] = 1;
-	}
-	return dest;
-}
+fltisval(int *dest, const double *arr, size_t len, double val);
 
 
 /*
@@ -1351,60 +626,30 @@ Returns array of 0s and 1s.
 Note that return array must have enough memory.
 */
 int *
-fltisnan(int *dest, const double *arr, size_t len)
-{
-	dest = intzeros(dest, len);
-	for (size_t i=0; i<len; i++){
-		if(arr[i] != arr[i])
-			dest[i] = 1;
-	}
-	return dest;
-}
+fltisnan(int *dest, const double *arr, size_t len);
 
 
 /* Converts an array of integers into an array of doubles */
 double *
-inttoflt(double *dest, const int *arr, size_t len)
-{
-	for(size_t i=0; i<len; i++)
-		dest[i] = (double)(arr[i]);
-	return dest;
-}
+inttoflt(double *dest, const int *arr, size_t len);
 
 /*
 Converts an array of integers into an array of doubles,
 allocates the new array, and returns a pointer to it.
 */
 double *
-inttofltA(const int *arr, size_t len)
-{
-	double *dest = fltzerosA(len);
-	for(size_t i=0; i<len; i++)
-		dest[i] = (double)(arr[i]);
-	return dest;
-}
+inttofltA(const int *arr, size_t len);
 
 /* Converts an array of doubles into an array of integers */
 int *
-flttoint(int *dest, const double *arr, size_t len)
-{
-	for(size_t i=0; i<len; i++)
-		dest[i] = (int)(arr[i]);
-	return dest;
-}
+flttoint(int *dest, const double *arr, size_t len);
 
 /*
 Converts an array of doubles into an array of integers,
 allocates the new array, and returns a pointer to it.
 */
 int *
-flttointA(const double *arr, size_t len)
-{
-	int *dest = intzerosA(len);
-	for(size_t i=0; i<len; i++)
-		dest[i] = (int)(arr[i]);
-	return dest;
-}
+flttointA(const double *arr, size_t len);
 
 
 
@@ -1421,20 +666,7 @@ Asks user for input with a message,
 and returns a string.
 */
 char *
-getstr(char *dest, const char *msg)
-{
-	size_t max_read = (size_t) 1E5;
-	printf("%s", msg);
-	char *ptr = fgets(dest, max_read, stdin);
-	if(!ptr){
-		printf(" Warning: no input read.\n");
-		return (NULL);
-	}
-	// Removes newline character from end of string
-	if (strchr(dest, '\n'))
-		strslc(dest, 0, strlen(dest)-2);
-	return dest;
-}
+getstr(char *dest, const char *msg);
 
 
 /*
@@ -1443,24 +675,7 @@ The result is stored at the input pointer 'dest'.
 On fail, NULL is returned.
 */
 int *
-strtoint(int *dest, const char *str)
-{
-	char *endptr;
-	int val;
-	if(!str){
-		fprintf(stderr, " Error: can't convert NULL to int.\n");
-		return (NULL);
-	}
-	//Convert string to integer.
-	val = (int) strtol(str, &endptr, 10);
-	//Checks if conversion worked
-	if(endptr == str){
-		fprintf(stderr, " Error: can't convert '%s' to int.\n", str);
-		return (NULL);
-	}
-	*dest = val;
-	return dest;
-}
+strtoint(int *dest, const char *str);
 
 
 /*
@@ -1469,15 +684,7 @@ into an array of integers.
 Values are stored in memory of input array 'dest'.
 */
 int *
-strtointArr(int *dest, const char **str, size_t size)
-{
-	for(size_t i=0; i<size; i++){
-		int *ret = strtoint(&(dest[i]), str[i]);
-		if(!ret)
-			return (NULL);
-	}
-	return dest;
-}
+strtointArr(int *dest, const char **str, size_t size);
 
 
 
@@ -1485,24 +692,7 @@ strtointArr(int *dest, const char **str, size_t size)
 Convert string to double.
 */
 double *
-strtoflt(double *dest, const char *str)
-{
-	char *endptr;
-	int val;
-	if(!str){
-		fprintf(stderr, " Error: can't convert NULL to double.\n");
-		return (NULL);
-	}
-	// Converts string to double
-	val = (double) strtod(str, &endptr);
-	// Checks if conversion worked
-	if(endptr == str){
-		fprintf(stderr, " Error: can't convert '%s' to double.\n", str);
-		return (NULL);
-	}
-	*dest = val;
-	return dest;
-}
+strtoflt(double *dest, const char *str);
 
 /*
 Converts and array of strings of length 'size' 
@@ -1510,15 +700,7 @@ into an array of doubles.
 Values are stored in memory of input array 'dest'.
 */
 double *
-strtofltArr(double *dest, const char **str, size_t size)
-{
-	for(size_t i=0; i<size; i++){
-		double *ret = strtoint(&(dest[i]), str[i]);
-		if(!ret)
-			return (NULL);
-	}
-	return dest;
-}
+strtofltArr(double *dest, const char **str, size_t size);
 
 
 
@@ -1527,17 +709,7 @@ Given a string and a delimiter,
 it returns the number of tokens in the string.
 */
 size_t
-strtokn(char *str, const char *delim)
-{
-	if(!str)
-		return 0;
-	size_t n = 0;
-	for(size_t i=0; i<strlen(str); i++){
-		if(str[i] == *delim)
-			n++;
-	}
-	return (n+1);
-}
+strtokn(char *str, const char *delim);
 
 
 /*
@@ -1550,26 +722,7 @@ If the end of the string is reached, a NULL
 pointer is returned.
 */
 char *
-strpar(char *ptr, const char delim)
-{
-	if(!ptr)
-		return (NULL);
- 
-	while(1)
-	{
-		if(ptr[0] == delim){
-			ptr[0] = '\0';
-			ptr++;
-			break;
-		}
-
-		else if(ptr[0] == '\0')
-			return (NULL);
-		ptr++;
-	}
-
-	return ptr;
-}
+strpar(char *ptr, const char delim);
 
 /*
 Given a string 'str' and a delimiter 'delim',
@@ -1579,22 +732,7 @@ a pointer to it.
 On fail, it returns NULL.
 */
 char **
-strsplit(char **dest, char *str, const char delim)
-{
-	if(!str)
-		return (NULL);
-
-	char *ptr = str;
-	size_t c = 0;
-
-	while( ptr != NULL ){
-		dest[c] = ptr;
-		c++;
-		ptr = strpar(ptr, delim);
-	}
-
-	return dest;
-}
+strsplit(char **dest, char *str, const char delim);
 
 
 
@@ -1613,31 +751,7 @@ Output:
 	size_t lineCount:	number of non-comment non-empty lines in file.
 */
 size_t
-CountTxtLines(size_t maxRead, const char *path, const char *comment)
-{
-	FILE *fdata;
-    fdata = fopen(path, "r");
-    if(!fdata){
-    	fprintf(stderr, " Error: '%s' file not found.\n", path);
-    	return 0;
-    }
-
-	char line[maxRead];
-    size_t lineCount = 0;
-    while(fgets(line, maxRead, fdata))
-    {
-    	//Ignore comment lines
-    	if (line[0] == *comment)
-    		continue;
-    	//Ignore empty lines
-    	if (line[0] == '\n')
-    		continue;
-    	lineCount++;
-    }
-
-    fclose(fdata);
-    return lineCount;
-}
+CountTxtLines(size_t maxRead, const char *path, const char *comment);
 
 
 /*
@@ -1659,31 +773,7 @@ Output:
 */
 char **
 ReadTxtLines(char **lines, size_t maxRead, 
-				const char *path, const char *comment)
-{
-	// Open file
-	FILE *fdata;
-    fdata = fopen(path, "r");
-    if(!fdata){
-    	fprintf(stderr, " Error: '%s' file not found.\n", path);
-    	return (NULL);
-    }
-
-	char line[maxRead];
-    size_t lineCount = 0;
-    while(fgets(line, maxRead, fdata))
-    {
-    	//Ignore comment lines
-    	if (line[0] == *comment)
-    		continue;
-    	//Ignore empty lines
-    	if (line[0] == '\n')
-    		continue;
-    	strcpy(lines[lineCount], line);
-    	lineCount++;
-    }
-    return lines;
-}
+				const char *path, const char *comment);
 
 
 /*
@@ -1714,97 +804,7 @@ Output:
 */
 char **
 GenFromTxt(const char *path, size_t *shape, const size_t maxSize, 
-			const char delim, const char comment)
-{
-	//Initialise shape to 0
-	shape[0] = 0;
-	shape[1] = 0;
-
-	//Counting rows
-	size_t lineCount = CountTxtLines(maxSize, path, &comment);
-	if(lineCount == 0)
-		return (NULL);
-
-	//Initializing pointer to array of lines
-	char lines[lineCount][maxSize];
-	char *lptr[lineCount];
-	for(size_t i=0; i<lineCount; i++)
-		lptr[i] = &(lines[i][0]);
-	char **l = &(lptr[0]);
-
-	//Reading lines
-	ReadTxtLines(l, maxSize, path, &comment);
-
-	//Removing final newline characters
-	for(size_t i=0; i<lineCount; i++)
-		strslc(l[i], 0, strlen(l[i])-2);
-
-	//Read delimiters from each line to confirm
-	//expected number of tokens
-	size_t tokens[lineCount];
-	for(size_t i=0; i<lineCount; i++){
-		tokens[i] = strtokn(l[i], &delim);
-	}
-
-	//Compare all tokens to first one
-	size_t initToken = tokens[0];
-	for(size_t i=0; i<lineCount; i++){
-		if (tokens[i] != initToken){
-			fprintf(stderr, " Error: wrong number of columns at line %d\n", (int) i);
-			return (NULL);
-		}
-	}
-
-	//Allocate array of strings
-	size_t bytes = lineCount*initToken*sizeof(char*);
-	char **m = malloc(bytes);
-	if(!m){
-		fprintf(stderr, " Error: failed to allocate %Iu bytes\n", bytes);
-		return (NULL);
-	}
-
-	//Allocate individual strings
-	int allocFail = (-1);
-	for(size_t i=0; i<(lineCount*initToken); i++){
-		m[i] = malloc(maxSize*sizeof(char));
-		if(!m){
-			allocFail = (int)i;
-			fprintf(stderr, " Error: failed to allocate %Iu bytes\n", maxSize*sizeof(char));
-			break;
-		}
-	}
-
-	//If failed to allocate a string, free those already allocated
-	if(allocFail >= 0){
-		for(int i=0; i<allocFail; i++)
-			free(m[i]);
-		free(m);
-		return(NULL);
-	}
-
-	//Tokenize
-	for(size_t i=0; i<(lineCount); i++){
-		//Split lines
-		char *ptr = l[i];
-		size_t c = 0;
-		char *p[initToken];
-		while( ptr != NULL ){
-			p[c] = ptr;
-			c++;
-			ptr = strpar(ptr, delim);
-		}
-		//Save in allocated memory
-		for(size_t j=0; j<(initToken); j++)
-			strcpy(m[j+i*initToken],p[j]);
-	}
-	
-	//Save shape in input pointer
-	shape[0] = lineCount;
-	shape[1] = initToken;
-
-	return (m);
-}
-
+			const char delim, const char comment);
 
 
 //int SaveToTxt(const char **data, size_t *shape, char *filename)
@@ -1812,3 +812,7 @@ GenFromTxt(const char *path, size_t *shape, const size_t maxSize,
 
 //array of doubles into strings
 //array of ints into strings
+
+
+
+#endif
