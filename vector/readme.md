@@ -52,6 +52,12 @@ Changes the size of a vector 'v' to an input value 's'. If the size is increased
 vector *vresize(vector *v, size_t s);
 ```
 
+### Get member
+Retrieves a pointer to the vector member at input index 'i'. 
+```c
+void *vat(vector *v, size_t i);
+```
+
 ### Fill
 Fills the whole vector with an input member 'ptr'. Existing member data is overwritten.
 ```c
