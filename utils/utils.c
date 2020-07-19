@@ -170,7 +170,7 @@ strrev(char *s)
 
 /* Generates an array of a given value */
 int *
-intval(int * arr, size_t s, int val)
+intval(int *arr, size_t s, int val)
 {
 	for(size_t i=0; i<s; i++)
 		arr[i] = val;
