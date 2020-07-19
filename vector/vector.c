@@ -121,7 +121,7 @@ vector *vinsert(vector *v, size_t j, void *new)
 	v->size++;
 
 	//Shift values forward from insert index
-	for(size_t i=vsize(v); i>j; i--)
+	for(size_t i=vsize(v)-1; i>j; i--)
 	{
 		void *dest = vat(v, i);
 		void *src = vat(v, i-1);
