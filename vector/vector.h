@@ -22,6 +22,8 @@ Allocates new vector and returns pointer to it
 */
 vector *vnew(size_t bytes);
 
+
+//		GETTERS
 /*
 Returns the size of the vector
 */
@@ -33,6 +35,9 @@ vector members' data type, in bytes
 */
 size_t vdtype(vector *v);
 
+/* Returns pointer to data array of vector */
+void *vdata(vector *v);
+
 /*
 Returns a pointer to a vector member.
 Must be cast to the appropriate data type.
@@ -42,6 +47,24 @@ returns a pointer to the first member (index 0)
 of a vector 'v' and casts it to a double.
 */
 void *vat(vector *v, size_t i);
+
+
+
+//		SETTERS
+
+
+/* Changes the value of a vector member */
+vector *vset(vector *v, size_t i, void *src);
+
+/*
+Substitutes every member in the vector with
+the input member
+*/
+vector *vfill(vector *v, void *src);
+
+
+
+//		SIZE MANIPULATION
 
 /*
 Inserts a new member into the vector
@@ -53,8 +76,6 @@ vector *vinsert(vector *v, size_t j, void *new);
 vector *vdelete(vector *v, size_t i);
 
 vector *vresize(vector *v, size_t newsize);
-
-vector *vfill(vector *v, void *src);
 
 void vfree(vector *v);
 

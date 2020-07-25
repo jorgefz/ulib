@@ -7,8 +7,8 @@ Includes a new structure, vector, that allows
 to create dynamic arrays that can be resized easily
 and hold any data type or structure.
 
-## Vector functions
-### Vector creation
+## Initialiser
+### New vector
 Initialises a new vector with members of size 'bytes' and returns a pointer to it.
 ```c
 vector *vnew(size_t bytes);
@@ -20,6 +20,7 @@ Frees the allocated memory of a vector 'v'.
 void vfree(vector *v);
 ```
 
+## Getters
 ### Vector size
 Retrieves the number of members in an input vector 'v'.
 ```c
@@ -31,6 +32,32 @@ Retrieves the size in bytes of the data type of individual members of a vector '
 ```c
 size_t vdtype(vector *v);
 ```
+
+### Vector data
+Retrieves pointer to data array of the vector.
+```c
+size_t vdata(vector *v);
+```
+
+### Get member
+Retrieves a pointer to the vector member at input index 'i'. 
+```c
+void *vat(vector *v, size_t i);
+```
+
+## Setters
+### Set
+Overwrites an existing vector member with input data.
+```c
+vector *vset(vector *v, size_t i, void *ptr);
+```
+
+### Fill
+Fills the whole vector with an input member 'ptr'. Existing member data is overwritten.
+```c
+vector *vfill(vector *v, void *ptr);
+```
+
 
 ### Insert member
 Inserts a new vector member 'ptr' at index 'i'.
@@ -50,16 +77,4 @@ vector *vdelete(vector *v, size_t i);
 Changes the size of a vector 'v' to an input value 's'. If the size is increased, new empty members are added. On the other hand, if the size is reduced, members at the end of the vector are lost. 
 ```c
 vector *vresize(vector *v, size_t s);
-```
-
-### Get member
-Retrieves a pointer to the vector member at input index 'i'. 
-```c
-void *vat(vector *v, size_t i);
-```
-
-### Fill
-Fills the whole vector with an input member 'ptr'. Existing member data is overwritten.
-```c
-vector *vfill(vector *v, void *ptr);
 ```

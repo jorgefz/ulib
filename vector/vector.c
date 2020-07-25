@@ -69,6 +69,8 @@ vector *vnew(size_t bytes)
 }
 
 
+//		GETTERS
+
 /*
 Returns the size of the vector
 */
@@ -85,6 +87,12 @@ vector members' data type, in bytes
 size_t vdtype(vector *v)
 {
 	return v->dtype;
+}
+
+/* Returns pointer to data array of vector */
+void *vdata(vector *v)
+{
+	return v->d;
 }
 
 
@@ -104,6 +112,35 @@ void *vat(vector *v, size_t i)
 	return ptr;
 }
 
+
+//		SETTERS
+
+/*
+Changes the value of a vector member
+*/
+vector *vset(vector *v, size_t i, void *src)
+{
+	if(i >= vsize(v))
+		return NULL;
+	void *dest = vat(v, i);
+	memcpy(dest, src, v->dtype);
+	return v;
+}
+
+/*
+Substitutes every member in the vector with
+the input member
+*/
+vector *vfill(vector *v, void *src)
+{
+	for(size_t i=0; i<vsize(v); i++)
+		vset(v, i, src);
+	return v;
+}
+
+
+
+//		SIZE MANIPULATION
 
 /*
 Inserts a new member into the vector
@@ -143,18 +180,25 @@ vector *vdelete(vector *v, size_t i)
 	if(i >= vsize(v))
 		return NULL;
 
+	//If there is only one member to delete, free instead
+	if(v->size == 1){
+		free(v->d);
+		v->size--;
+		return v;
+	}
+
 	//Shift memory back over deleted member
 	for(size_t j=i; j<vsize(v)-1; j++){
-		void *dest = vat(v, j);
 		void *src = vat(v, j+1);
+		void *dest = vat(v, j);
 		memcpy(dest, src, v->dtype);
 	}
 
-	//Reallocate to reduce memory usage
-	v->d = realloc(v->d, sizeof(v->dtype)*(v->size-1) );
-	if(v->d == NULL)
-		return NULL;
+	//Reallocate to reduce memory usage	
+	v->d = realloc(v->d, v->dtype*(v->size-1) );	
 	v->size--;
+	if(!v->d)
+		return NULL;
 
 	return v;
 }
@@ -170,19 +214,6 @@ vector *vresize(vector *v, size_t newsize)
 	if(v->d == NULL)
 		return NULL;
 	v->size = newsize;
-	return v;
-}
-
-/*
-Substitutes every member in the vector with
-the input member
-*/
-vector *vfill(vector *v, void *src)
-{
-	for(size_t i=0; i<vsize(v); i++){
-		void *dest = vat(v, i);
-		memcpy(dest, src, v->dtype);
-	}
 	return v;
 }
 
