@@ -9,10 +9,13 @@ and hold any data type or structure.
 
 ## Initialiser
 ### New vector
-Initialises a new vector with members of size 'bytes' and returns a pointer to it.
+Initialises a new vector with members of data type T.
 ```c
-vector *vnew(size_t bytes);
+vector *vnew( T );
 ```
+Example:
+`vector *v = vnew(int)`{:.c} creates a vector of integers.
+`vector *v = vnew(Obj *)`{:.c} creates a vector of pointers to structures called 'Obj'.
 
 ### Vector deletion
 Frees the allocated memory of a vector 'v'.

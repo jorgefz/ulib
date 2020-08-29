@@ -8,11 +8,24 @@
 #include <string.h>
 
 
+
+/*
+Macro to create new vector.
+
+vnew( data_type ) => vnew( "data_type", sizeof(data_type) )
+
+Example of creating vector:
+	vector *v = vnew(int)
+*/
+#define vnew(type) _vnew( (#type), sizeof(type))
+
+
 typedef struct vectorStruct
 {
 	void *d;
 	size_t size;
 	size_t dtype;
+	char *dtype_name;
 } vector;
 
 
@@ -20,7 +33,7 @@ typedef struct vectorStruct
 /*
 Allocates new vector and returns pointer to it
 */
-vector *vnew(size_t bytes);
+vector *_vnew(char *T, size_t bytes);
 
 
 //		GETTERS
@@ -47,6 +60,11 @@ returns a pointer to the first member (index 0)
 of a vector 'v' and casts it to a double.
 */
 void *vat(vector *v, size_t i);
+
+/*
+Returns the total memory allocated for the vector
+*/
+size_t vmem(vector *v);
 
 
 

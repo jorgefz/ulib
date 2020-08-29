@@ -43,6 +43,13 @@
 		- Added functions to aid vector manipulation
 		vdtype, vresize, vfill
 
+	1.1 - 25/07/2020
+		- Solved bug with vinsert.
+		- Added function to retrieve data array
+		directly: vdata
+		- Addded function to overwrite specific
+		vector member: vset
+
 
 
 */
@@ -54,10 +61,12 @@
 #include "vector.h"
 
 
+
+
 /*
 Allocates new vector and returns pointer to it
 */
-vector *vnew(size_t bytes)
+vector *_vnew(char *T, size_t bytes)
 {
 	vector *v = malloc(sizeof(vector));
 	if(!v)
@@ -65,6 +74,10 @@ vector *vnew(size_t bytes)
 	v->d = NULL;
 	v->size = 0;
 	v->dtype = bytes;
+
+	v->dtype_name = malloc( strlen(T) + 1);
+	strcpy(v->dtype_name, T);
+
 	return v;
 }
 
@@ -110,6 +123,19 @@ void *vat(vector *v, size_t i)
 		return NULL;
 	void *ptr = v->d + i*v->dtype;
 	return ptr;
+}
+
+
+/*
+Returns the total memory allocated for the vector
+*/
+size_t vmem(vector *v)
+{
+	if(!v)
+		return 0;
+	if(vsize(v)==0)
+		return sizeof(vector); 
+	return sizeof(vector)+vsize(v)*vdtype(v);
 }
 
 
@@ -223,5 +249,6 @@ Frees the vector
 void vfree(vector *v)
 {
 	free(v->d);
+	free(v->dtype_name);
 	free(v);
 }
