@@ -92,7 +92,6 @@ size_t vsize(vector *v)
 	return v->size;
 }
 
-
 /*
 Returns the memory size of the
 vector members' data type, in bytes
@@ -251,4 +250,17 @@ void vfree(vector *v)
 	free(v->d);
 	free(v->dtype_name);
 	free(v);
+}
+
+
+#define vtovector(arr, n, type) _vtovector(arr, n, #type, sizeof(type))
+/*
+Converts an array into a vector
+*/
+vector *_vtovector(void *arr, size_t elem_num, char *T, size_t elem_size)
+{
+	vector *v = _vnew(T, elem_size);
+	vresize(v, elem_num);
+	memcpy(vdata(v), arr, elem_num*elem_size);
+	return v;
 }

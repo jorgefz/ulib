@@ -97,6 +97,10 @@ vector *vresize(vector *v, size_t newsize);
 
 void vfree(vector *v);
 
+#define vtovector(arr, n, type) _vtovector(arr, n, #type, sizeof(type))
+/* Converts an array into a vector */
+vector *_vtovector(void *arr, size_t elem_num, char *T, size_t elem_size);
+
 
 
 #endif
