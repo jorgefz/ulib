@@ -17,10 +17,10 @@ This function automatically adds the help flag option, with labels '-h' and '--h
 In order to add a custom option, use the function:
 ```c
 _ARGS *ret = arglib_add_option(_ARGS *opt, 
-							const char c_label, 
-							const char *s_label,  
-							const char *descr, 
-							int type, int req);
+				const char c_label, 
+				const char *s_label,  
+				const char *descr, 
+				int type, int req);
 ```
 Here, 'opt' is the pointer returned from the initialisation function, 'c_label' is the single character label, 's_label' is the multi-character string label (of max length 16), 'descr' is a string (of maximum length 50) that describes the option, 'type' is the data type of option, and 'req' describes whether the option is required or optional.
 
@@ -63,8 +63,8 @@ int argnum = arglib_argnum(_ARGS *opt);
 The next step is to parse the input arguments with the defined options, using the following function:
 ```c
 _ARGS *ret = arglib_parse(_ARGS *opt, 
-						const int argc, 
-						const char *argv[]);
+				const int argc, 
+				const char *argv[]);
 ```
 This function will search for option labels on the input arguments and read their arguments where applicable. If an error occurs, the function returns NULL; this includes an unrecognised option, a missing option argument or of the wrong data type, an undefined required option, or if one of the options is the help flag ('-h' or '--help').
 
