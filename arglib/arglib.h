@@ -105,6 +105,10 @@
 			Now description is dynamically allocated.
 		- Made _ARGS pointer global, hidden from user.
 
+	v 1.1 - 02/10/2020
+		- Fixed padding on help command
+		- Reduced max size of string label to 12 characters
+
 
 
 
@@ -134,7 +138,7 @@
 #define ARG_OPT 1
 
 /* MAX string length of multi-char label */
-#define ARG_MAX_SLABEL_LEN 16
+#define ARG_MAX_SLABEL_LEN 12
 
 
 typedef struct args_struct{

@@ -12,7 +12,7 @@
 static char *_dtypes[] = {"flag", "int", "double", "string"};
 
 /* String representation for required/optional flags */
-static char *_reqflag[] = {"(required)", "(optional)"};
+static char *_reqflag[] = {"required", "optional"};
 
 /* Length of argument list, global */
 size_t ARG_NUM = 0;
@@ -131,13 +131,37 @@ static void arglib_help(const char *argv[])
 		// Char Label
 		printf(" %5s-%c,", "", ARGLIB_ARG_STRUCT[i].c_label);
 		// Multi-char label
-		printf(" %5s--%s ", "", ARGLIB_ARG_STRUCT[i].s_label);
+		printf(" --%-12s :",ARGLIB_ARG_STRUCT[i].s_label);
 
 		// Param type & Req
-		printf(": %10s(%s)%s", "", _dtypes[ARGLIB_ARG_STRUCT[i].dtype], _reqflag[ARGLIB_ARG_STRUCT[i].flag_req]);
+		int padding = strlen("required")+strlen("double")+10;
+		char paddedStr[padding];
+		strcpy(paddedStr, "(");
+		strcat(paddedStr, _dtypes[ARGLIB_ARG_STRUCT[i].dtype]);
+		strcat(paddedStr, ", ");
+		strcat(paddedStr, _reqflag[ARGLIB_ARG_STRUCT[i].flag_req]);
+		strcat(paddedStr, ")");
+		printf("%-*s",padding, paddedStr);
 
 		// Description
-		printf(" %s\n", ARGLIB_ARG_STRUCT[i].descr);
+		printf("%s\n", ARGLIB_ARG_STRUCT[i].descr);
+
+		/*
+		|     -c, --compiler 		:(double, required)      Description
+		|     -v, --verbose			:(flag, optional)		 Description
+		...
+		*/
+
+		/*
+		Note: %10s ->  |      text|
+			  %-10s -> |text      |
+
+		%5s-%c, --%-16s :(%s, %s)
+
+
+		*/
+
+
 	}
 }
 

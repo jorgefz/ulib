@@ -22,7 +22,7 @@ arglib_add_option(
 		const char *descr, 
 		int type, int req);
 ```
-Here, 'c_label' is the single character label, 's_label' is the multi-character string label (of max length 16), 'descr' is a string that describes the option, 'type' is the data type of option, and 'req' describes whether the option is required or optional.
+Here, 'c_label' is the single character label, 's_label' is the multi-character string label (of max length 12), 'descr' is a string that describes the option, 'type' is the data type of option, and 'req' describes whether the option is required or optional.
 
 Both the type and the required flag are defined with library-provided macros:
 
