@@ -9,23 +9,12 @@
 
 
 
-/*
-Macro to create new vector.
-
-vnew( data_type ) => vnew( "data_type", sizeof(data_type) )
-
-Example of creating vector:
-	vector *v = vnew(int)
-*/
-#define vnew(type) _vnew( (#type), sizeof(type))
-
 
 typedef struct vectorStruct
 {
 	void *d;
 	size_t size;
 	size_t dtype;
-	char *dtype_name;
 } vector;
 
 
@@ -33,7 +22,7 @@ typedef struct vectorStruct
 /*
 Allocates new vector and returns pointer to it
 */
-vector *_vnew(char *T, size_t bytes);
+vector *vnew(size_t bytes);
 
 
 //		GETTERS
@@ -97,9 +86,8 @@ vector *vresize(vector *v, size_t newsize);
 
 void vfree(vector *v);
 
-#define vtovector(arr, n, type) _vtovector(arr, n, #type, sizeof(type))
 /* Converts an array into a vector */
-vector *_vtovector(void *arr, size_t elem_num, char *T, size_t elem_size);
+vector *vtovector(void *arr, size_t elem_num, size_t elem_size);
 
 
 

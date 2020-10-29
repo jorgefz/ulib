@@ -9,13 +9,13 @@ and hold any data type or structure.
 
 ## Initialiser
 ### New vector
-Initialises a new vector with members of data type T.
+Initialises a new vector with members of data type size 'bytes'.
 ```c
-vector *vnew( T );
+vector *vnew( bytes );
 ```
 Example:
-`vector *v = vnew(int)`{:.c} creates a vector of integers.
-`vector *v = vnew(Obj *)`{:.c} creates a vector of pointers to structures called 'Obj'.
+`vector *v = vnew( sizeof(int) )`{:.c} creates a vector of integers.
+`vector *v = vnew( sizeof(Obj *) )`{:.c} creates a vector of pointers to structures called 'Obj'.
 
 ### Vector deletion
 Frees the allocated memory of a vector 'v'.
@@ -80,4 +80,12 @@ vector *vdelete(vector *v, size_t i);
 Changes the size of a vector 'v' to an input value 's'. If the size is increased, new empty members are added. On the other hand, if the size is reduced, members at the end of the vector are lost. 
 ```c
 vector *vresize(vector *v, size_t s);
+```
+
+
+### Array to vector
+Converts the input array 'arr', with 'n' memebrs of size 'b' bytes each,
+into a vector. It returns a pointer to the newly created vector.
+```c
+vector *vtovector(void *arr, size_t n, size_t b);
 ```

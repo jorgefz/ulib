@@ -50,6 +50,10 @@
 		- Addded function to overwrite specific
 		vector member: vset
 
+	1.2 - 29/10/2020
+		- Added vtovector to convert conventional
+			array to vector
+			
 
 
 */
@@ -66,7 +70,7 @@
 /*
 Allocates new vector and returns pointer to it
 */
-vector *_vnew(char *T, size_t bytes)
+vector *vnew(size_t bytes)
 {
 	vector *v = malloc(sizeof(vector));
 	if(!v)
@@ -74,9 +78,6 @@ vector *_vnew(char *T, size_t bytes)
 	v->d = NULL;
 	v->size = 0;
 	v->dtype = bytes;
-
-	v->dtype_name = malloc( strlen(T) + 1);
-	strcpy(v->dtype_name, T);
 
 	return v;
 }
@@ -248,18 +249,16 @@ Frees the vector
 void vfree(vector *v)
 {
 	free(v->d);
-	free(v->dtype_name);
 	free(v);
 }
 
 
-#define vtovector(arr, n, type) _vtovector(arr, n, #type, sizeof(type))
 /*
 Converts an array into a vector
 */
-vector *_vtovector(void *arr, size_t elem_num, char *T, size_t elem_size)
+vector *vtovector(void *arr, size_t elem_num, size_t elem_size)
 {
-	vector *v = _vnew(T, elem_size);
+	vector *v = vnew(elem_size);
 	vresize(v, elem_num);
 	memcpy(vdata(v), arr, elem_num*elem_size);
 	return v;
