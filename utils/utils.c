@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <stdarg.h>
 
 #include "utils.h"
 
@@ -14,47 +15,6 @@
 	DATA TYPES
 */
 typedef unsigned int uint;
-
-
-/*
-	MEMORY
-*/
-/*
-Allocates some memory of length 'bytes',
-and returns a pointer ot it.
-On fail, it exits the program.
-*/
-void *
-xmalloc(size_t bytes)
-{
-	if (bytes == 0){
-		fprintf(stderr, " Error: can't allocate 0 bytes\n");
-		exit(-1);
-		return (NULL);
-	}
-    void *ptr = malloc(bytes);
-    if (ptr)
-        return ptr;
-
-    fprintf(stderr, " Error: can't allocate %ld bytes\n", (long)bytes);
-    exit(-1);
-	return (NULL);
-}
-
-/*
-Checks if pointer points to allocated memory
-before freeing it.
-*/
-int
-xfree(void *ptr)
-{
-	if (ptr){
-		free(ptr);
-		return 0;
-	}
-	fprintf(stderr, " Error: failed to free pointer");
-	return (-1);
-}
 
 
 
@@ -68,7 +28,7 @@ and returns a pointer to it.
 Note: free the string once it has been used.
 */
 char *
-strcpyA(const char *str)
+strcpy_alloc(const char *str)
 {
 	if(!str)
 		return (NULL);
@@ -160,6 +120,27 @@ strrev(char *s)
 	return s;
 }
 
+/*
+Joins a series of strings into one,
+stores the result in an input string 'dest',
+and returns a pointer to it.
+*/
+char *strjoin(char *dest, int num, ...)
+{
+	// strjoin will replace whichever text
+	// was on dets before
+	strcpy(dest, "\0");
+	va_list segments;
+	va_start(segments, num);
+	for(int i=0; i<num; i++)
+	{
+		char *str = va_arg(segments, char*);
+		strcat(dest, str);
+	}
+	va_end(segments);
+	return dest;
+}
+
 
 
 
@@ -179,7 +160,7 @@ intval(int *arr, size_t s, int val)
 
 /* Generates an array of a given value */
 int *
-intvalA(size_t s, int val)
+intval_alloc(size_t s, int val)
 {
 	int *arr = malloc(s*sizeof(int));
 	if(!arr)
@@ -201,9 +182,9 @@ Allocates and generates an array of zeros.
 You will need to free the pointer afterwards manually.
 */
 int *
-intzerosA(size_t s)
+intzeros_alloc(size_t s)
 {
-	int *arr = intvalA(s, 0);
+	int *arr = intval_alloc(s, 0);
 	return arr;
 }
 
@@ -220,9 +201,9 @@ Allocates and generates an array of ones.
 You will need to free the pointer afterwards manually.
 */
 int *
-intonesA(size_t s)
+intones_alloc(size_t s)
 {
-	int *arr = intvalA(s, 1);
+	int *arr = intval_alloc(s, 1);
 	return arr;
 }
 
@@ -244,7 +225,7 @@ Allocates and generates an array of values in a range.
 You will need to free the pointer afterwards.
 */
 int *
-intrangeA(size_t s, int start, int step)
+intrange_alloc(size_t s, int start, int step)
 {
 	/*Allocating pointer*/
 	int *arr = (int *) malloc(s*sizeof(int));
@@ -276,7 +257,7 @@ and returns a pointer to it.
 You will have to free it afterwards.
 */
 int *
-intcpyA(const int *src, size_t s)
+intcpy_alloc(const int *src, size_t s)
 {
 	if(!src)
 		return (NULL);
@@ -309,7 +290,7 @@ and returns a pointer to it.
 You will have to free it afterwards.
 */
 int *
-intcatA(const int *a, size_t as, 
+intcat_alloc(const int *a, size_t as, 
 		const int *b, size_t bs)
 {
 	/* Check input */
@@ -562,9 +543,9 @@ than the size of the previous one, and must be freed
 after its use.
 */
 int *
-intinsA(const int *arr, size_t len, size_t index, int val)
+intins_alloc(const int *arr, size_t len, size_t index, int val)
 {
-	int *dest = intzerosA(len+1);
+	int *dest = intzeros_alloc(len+1);
 	if(!dest)
 		return (NULL);
 	intins(dest, arr, len, index, val);
@@ -649,12 +630,27 @@ intsmult(int *arr, size_t len, int val)
 int
 intdot(const int *a, const int *b, size_t len)
 {
-	int *arr = intcpyA(a, len);
+	int *arr = intcpy_alloc(a, len);
 	int dot = intsum(intmult(arr, b, len), len);
 	free(arr); 
 	return dot;
 }
 
+/*
+Find if an array has a value.
+Returns the array pointer if successfull,
+and NULL otherwise.
+*/
+int *
+intisval_any(int *arr, size_t len, int val)
+{
+	for (size_t i=0; i<len; i++){
+		if(arr[i] == val){
+			return arr;
+		}
+	}
+	return NULL;
+}
 
 
 
@@ -676,7 +672,7 @@ fltval(double * arr, size_t s, double val)
 
 /* Generates an array of a given value */
 double *
-fltvalA(size_t s, double val)
+fltval_alloc(size_t s, double val)
 {
 	double *arr = (double *) malloc(s*sizeof(double));
 	if(!arr)
@@ -698,9 +694,9 @@ Allocates and generates an array of zeros.
 You will need to free the pointer afterwards manually.
 */
 double *
-fltzerosA(size_t s)
+fltzeros_alloc(size_t s)
 {
-	double *arr = fltvalA(s, 0);
+	double *arr = fltval_alloc(s, 0);
 	return arr;
 }
 
@@ -717,9 +713,9 @@ Allocates and generates an array of ones.
 You will need to free the pointer afterwards manually.
 */
 double *
-fltonesA(size_t s)
+fltones_alloc(size_t s)
 {
-	double *arr = fltvalA(s, 1);
+	double *arr = fltval_alloc(s, 1);
 	return arr;
 }
 
@@ -741,7 +737,7 @@ Allocates and generates an array of values in a range.
 You will need to free the pointer afterwards.
 */
 double *
-fltrangeA(size_t s, double start, double step)
+fltrange_alloc(size_t s, double start, double step)
 {
 	/*Allocating pointer*/
 	double *arr = (double *) malloc(s*sizeof(double));
@@ -773,7 +769,7 @@ and returns a pointer to it.
 You will have to free it afterwards.
 */
 double *
-fltcpyA(const double *src, size_t s)
+fltcpy_alloc(const double *src, size_t s)
 {
 	if(!src)
 		return (NULL);
@@ -806,7 +802,7 @@ and returns a pointer to it.
 You will have to free it afterwards.
 */
 double *
-fltcatA(const double *a, size_t as, 
+fltcat_alloc(const double *a, size_t as, 
 		const double *b, size_t bs)
 {
 	/* Check input */
@@ -1039,10 +1035,10 @@ than the size of the previous one, and must be freed
 after its use.
 */
 double *
-fltdelA(const double *arr, size_t len, size_t index)
+fltdel_alloc(const double *arr, size_t len, size_t index)
 {
 
-	double *dest = fltcpyA(arr, len-1);
+	double *dest = fltcpy_alloc(arr, len-1);
 	if (index >= len)
 		return dest;
 	for(size_t i=index; i<(len-1); i++)
@@ -1082,9 +1078,9 @@ than the size of the previous one, and must be freed
 after its use.
 */
 double *
-fltinsA(const double *arr, size_t len, size_t index, double val)
+fltins_alloc(const double *arr, size_t len, size_t index, double val)
 {
-	double *temp = fltzerosA(len+1);
+	double *temp = fltzeros_alloc(len+1);
 	if(!temp)
 		return (NULL);
 	fltins(temp, arr, len, index, val);
@@ -1250,21 +1246,25 @@ fltmag(const double *arr, size_t len)
 	return sqrt(fltdot(arr,arr,len));
 }
 
+
 /*
-Find if array member is a value.
-Returns array of 0s and 1s, where 0 is not value, and 1 is value.
-Note that return array must have enough memory.
+Find if an array has a value.
+Returns the array pointer if successfull,
+and NULL otherwise.
 */
-int *
-fltisval(int *dest, const double *arr, size_t len, double val)
+
+double *
+fltisval_any(double *arr, size_t len, double val)
 {
-	dest = intzeros(dest, len);
 	for (size_t i=0; i<len; i++){
-		if(arr[i] == val)
-			dest[i] = 1;
+		if(arr[i] == val){
+			return arr;
+		}
 	}
-	return dest;
+	return NULL;
 }
+
+
 
 
 /*
@@ -1273,7 +1273,7 @@ Returns array of 0s and 1s.
 Note that return array must have enough memory.
 */
 int *
-fltisnan(int *dest, const double *arr, size_t len)
+fltisnan_where(int *dest, const double *arr, size_t len)
 {
 	dest = intzeros(dest, len);
 	for (size_t i=0; i<len; i++){
@@ -1282,6 +1282,53 @@ fltisnan(int *dest, const double *arr, size_t len)
 	}
 	return dest;
 }
+
+/*
+Returns the input array pointer if it finds any NAN
+values in the array.
+Otherwise, returns NULL.
+*/
+double *
+fltisnan_any(double *arr, size_t len)
+{
+	for (size_t i=0; i<len; i++){
+		if(arr[i] != arr[i]){
+			return arr;
+		}
+	}
+	return NULL;
+}
+
+
+/*
+Substitutes NAN values found in an array with an input double 'val'.
+Returns NULL if no NAN values where found.
+*/
+double *
+fltisnan_subs(double *arr, size_t len, double val)
+{
+	for (size_t i=0; i<len; i++){
+		if(arr[i] != arr[i]){
+			arr[i] = val;
+		}
+	}
+	return arr;
+}
+
+
+
+
+// ARRAY TYPE CONVERSIONS
+
+
+// Maybe with a macro??
+/*
+#define ARR_CONV(arr, dest, len, type) do {\
+			for(int i=0; i<len; i++){\
+				dest[i] = (type) arr[i]\
+			}\
+		} while(0)\
+*/
 
 
 /* Converts an array of integers into an array of doubles */
@@ -1298,9 +1345,9 @@ Converts an array of integers into an array of doubles,
 allocates the new array, and returns a pointer to it.
 */
 double *
-inttofltA(const int *arr, size_t len)
+inttoflt_alloc(const int *arr, size_t len)
 {
-	double *dest = fltzerosA(len);
+	double *dest = fltzeros_alloc(len);
 	for(size_t i=0; i<len; i++)
 		dest[i] = (double)(arr[i]);
 	return dest;
@@ -1320,9 +1367,9 @@ Converts an array of doubles into an array of integers,
 allocates the new array, and returns a pointer to it.
 */
 int *
-flttointA(const double *arr, size_t len)
+flttoint_alloc(const double *arr, size_t len)
 {
-	int *dest = intzerosA(len);
+	int *dest = intzeros_alloc(len);
 	for(size_t i=0; i<len; i++)
 		dest[i] = (int)(arr[i]);
 	return dest;
@@ -1391,7 +1438,7 @@ into an array of integers.
 Values are stored in memory of input array 'dest'.
 */
 int *
-strtointArr(int *dest, const char **str, size_t size)
+strtoint_arr(int *dest, const char **str, size_t size)
 {
 	for(size_t i=0; i<size; i++){
 		int *ret = strtoint(&(dest[i]), str[i]);
@@ -1432,7 +1479,7 @@ into an array of doubles.
 Values are stored in memory of input array 'dest'.
 */
 double *
-strtofltArr(double *dest, const char **str, size_t size)
+strtoflt_arr(double *dest, const char **str, size_t size)
 {
 	for(size_t i=0; i<size; i++){
 		double *ret = strtoflt(&(dest[i]), str[i]);
@@ -1728,10 +1775,57 @@ GenFromTxt(const char *path, size_t *shape, const size_t maxSize,
 }
 
 
+/*
+	Saves an array of strings 'data' into separate lines
+	in a text file at 'path'.
+*/
+char *
+SaveToTxt(char **data, size_t lines, const char *path)
+{
+	FILE *fs = NULL;
+	fs = fopen(path,"w");
+	if(!fs){
+		return NULL;
+	}
 
-//int SaveToTxt(const char **data, size_t *shape, char *filename)
+	for(size_t i=0; i<lines; i++)
+	{
+		fprintf(fs, "%s\n",data[i]);
+	}
+	fclose(fs);
+	return data[0];
+}
 
 
-//array of doubles into strings
-//array of ints into strings
+/*
+Converts an array of doubles into strings,
+which are saved at location 'dest'.
+For every string, only 'str_size' chars are stored.
+*/
+char **
+flttostr_arr(double *arr, size_t len, char **dest)
+{
+	for(size_t i=0; i<len; i++)
+	{
+		sprintf(dest[i], "%.15g", arr[i]);
+	}
+	return dest;
+}
+
+
+/*
+Converts an array of integers into strings,
+which are saved at location 'dest'.
+For every string, only 'str_size' chars are stored.
+*/
+char **
+inttostr_arr(int *arr, size_t len, char **dest)
+{
+	for(size_t i=0; i<len; i++)
+	{
+		sprintf(dest[i], "%d", arr[i]);
+	}
+	return dest;
+}
+
 
