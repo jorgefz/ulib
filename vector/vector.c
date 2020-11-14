@@ -248,6 +248,9 @@ Frees the vector
 */
 void vfree(vector *v)
 {
+	if(!v){
+		return;
+	}
 	free(v->d);
 	free(v);
 }
