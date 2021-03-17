@@ -86,101 +86,37 @@
 		Added file I/O function: SaveToTxt
 		Renamed functions that return allocated memory from 'A' to '_alloc'.
 
+	1.8 - 16/03/2021
+		Added unsigned char - uchar.
+		Removed wacky macros
+		strcpya
+		-Enum for types
+		-Support for int, double, and bool arrays.
+		-Error management with errno
+
+
 
 	FUTURE PLANS
-
+	
+	Sorting
 	Matrices
 	I/O
 	Printf functions
 	Plotting
 
-
-		
-
-
 */
 
 
-/*
-	MACROS
-*/
 
-/*
-For the following macros,
-the input variable 'cmp' accepts a comparison operator
-(==, !=, >=, >; <=, <).
-The macro takes the operator argument, and places
-it on a comparison between the array members
-and the input value.
-*/
+// ---------------------------------------
 
-/*
-This macro simply takes an input array 'arr'
-and compares every member to a value 'val'.
-The results of the comparisons are saved as
-1s (if successful) or 0s (otherwise) in an
-input array of integers 'dest'.
-*/
-#define ARR_WHERE(dest, len, arr, cmp, val) do {\
-			for(size_t _i=0; _i<len; _i++){\
-				dest[i] = 0;\
-				if(arr[i] cmp val ){\
-					dest[i] = 1;\
-				}\
-			}\
-		} while(0)\
-
-
-/*
-This macro searches for any array member
-that satisfies the comparison 'cmp' with
-the value 'val'.
-The result (0 if successful, or 1 otherwise)
-is stored on input variable 'ret'.
-*/
-#define ARR_ANY(ret, len, arr, cmp, val) do {\
-			ret = 0;\
-			for(size_t _i=0; _i<len; _i++){\
-				if(arr[i] cmp val ){\
-					*ret = 1;\
-					break;\
-				}\
-			}\
-		} while(0)\
-
-/*
-This macro searches for the number of array members
-that satisfy a given comparison 'cmp' with a
-value 'val'.
-The result is stored on a variable 'count'.
-*/
-#define ARR_COUNT(count, len, arr, cmp, val) do {\
-			count = 0;\
-			for(size_t _i=0; _i<len; _i++){\
-				if(arr[i] cmp val ){\
-					count++;\
-				}\
-			}\
-		} while(0)\
-
-
-/*
-Substitutes any array member that satisfies
-a comparison 'cmp' with value 'val', with
-another value 'sub'.
-*/
-#define ARR_SUBS(len, arr, cmp, val, sub) do {\
-			for(size_t _i=0; _i<len; _i++){\
-				if(arr[i] cmp val ){\
-					arr[i] = sub;\
-				}\
-			}\
-		} while(0)\
+enum {
+	INT, DOUBLE, BOOL
+}
 
 
 
 //-----------------------------------------
-
 
 /*
 	STRINGS
@@ -233,7 +169,7 @@ char *strjoin(char *dest, int num, ...);
 
 
 /*
-	INTEGER 1D ARRAYS
+	INTEGER ARRAYS
 */
 
 /* Generates an array of a given value */
