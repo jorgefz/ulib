@@ -7,10 +7,15 @@ Header-only library that adds the array data structure,
 a list of numbers of immutable length, on which
 a number of operations can be performed.
 
+In order to use the functions from this library, write:
+	#define ARRAY_IMPLEMENTATION
+and THEN include the library:
+	#include "array.h"
+
 Currently, it only supports arrays of ints and doubles.
 
-Standard: C99
-Compiler: GCC
+Standard: ANSI C89
+Compiler: GCC version 9.2.0 (tdm64-1)
 
 
 VERSIONS
@@ -24,6 +29,10 @@ v0.1 - 18/03/2021
 	- Get values (geti, getf) or a pointer (at).
 	- Set values (seti, setf)
 
+v0.2 - 19/03/2021
+	- Rewritten in ANSI C89
+	- Fixed bug with linespace function
+
 Planned
 	- Stats: max, min, sum, average, mean, median, etc.
 	- Operations: add, sub, mult, div, mod
@@ -33,96 +42,105 @@ Planned
 */
 
 
+/*
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		HEADER
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+*/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef ARRAY_H
 #define ARRAY_H
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
 #include <stdarg.h>
 #include <math.h>
 #include <string.h>
 
-
 /*
- *	====================================
  *	DATA STRUCTURES & MACROS
- *	====================================
  */
-
 typedef unsigned int uint;
 typedef unsigned char uchar;
+typedef unsigned long ulong;
 
 struct __attribute__((__packed__)) __array_struct {
 	char* data;
-	uint64_t size;
-	uint8_t type;
-	uint64_t bytes; //size in bytes of each member
+	ulong size;
+	uint type;
+	ulong bytes; /* size in bytes of each member */
 
-	//Function pointers here
+	/* Function pointers */
 	void (*free)(struct __array_struct*);
 	void (*fill)(struct __array_struct*, ...);
 	void (*print)(struct __array_struct*);
 	void (*range)(struct __array_struct*, ...);
 	void (*linspace)(struct __array_struct*, ...);
-	int (*geti)(struct __array_struct*, uint64_t ind);
-	double (*getf)(struct __array_struct*, uint64_t ind);
-	void (*seti)(struct __array_struct*, uint64_t ind, int value);
-	void (*setf)(struct __array_struct*, uint64_t ind, double value);
-	char* (*at)(struct __array_struct*, uint64_t ind);
+	int (*geti)(struct __array_struct*, ulong ind);
+	double (*getf)(struct __array_struct*, ulong ind);
+	void (*seti)(struct __array_struct*, ulong ind, int value);
+	void (*setf)(struct __array_struct*, ulong ind, double value);
+	char* (*at)(struct __array_struct*, ulong ind);
 	void (*from_c_array)(struct __array_struct*, const void* c_arr);
 };
 typedef struct __array_struct array;
 
-enum { INT, DOUBLE }; //Supported types
+enum __array_types {
+	INT, DOUBLE
+}; /* Supported types */
 
 
 /*
- *	====================================
  *	FUNCTION DECLARATIONS
- *	====================================
  */
 
-static inline uint64_t __type_bytes(uint8_t type);
+ulong __type_bytes(uint type);
 
-static inline void __array_free(array* arr);
-static inline void __array_debug(array* arr);
-static inline void __array_from_c_array(array* arr, const void* c_arr);   
+void __array_free(array* arr);
+void __array_debug(array* arr);
+void __array_from_c_array(array* arr, const void* c_arr);   
 
-static inline int     __array_getval_int(array* arr, uint64_t ind);
-static inline double  __array_getval_db(array* arr, uint64_t ind);
-static inline char*   __array_getptr(array* arr, uint64_t ind);
-static inline void    __array_setval_int(array* arr, uint64_t ind, int value);
-static inline void    __array_setval_db(array* arr, uint64_t ind, double value);
+int     __array_getval_int(array* arr, ulong ind);
+double  __array_getval_db(array* arr, ulong ind);
+char*   __array_getptr(array* arr, ulong ind);
+void    __array_setval_int(array* arr, ulong ind, int value);
+void    __array_setval_db(array* arr, ulong ind, double value);
 
-static inline void __array_fill_int(array* arr, int value);
-static inline void __array_fill_db(array* arr, double value);
-static inline void __array_fill(array* arr, ...);
+void __array_fill_int(array* arr, int value);
+void __array_fill_db(array* arr, double value);
+void __array_fill(array* arr, ...);
 
-static inline void __array_print_int(array* arr);
-static inline void __array_print_double(array* arr);
-static inline void __array_print(array* arr);
+void __array_print_int(array* arr);
+void __array_print_double(array* arr);
+void __array_print(array* arr);
 
-static inline void __array_fill_range_int(array* arr, int start, int end);
-static inline void __array_fill_range_db(array* arr, double start, double end);
-static inline void __array_fill_range(array* arr, ...);
+void __array_fill_range_int(array* arr, int start, int end);
+void __array_fill_range_db(array* arr, double start, double end);
+void __array_fill_range(array* arr, ...);
 
-static inline void __array_fill_linspace_int(array* arr, int start, int step);
-static inline void __array_fill_linspace_db(array* arr, double start, double step);
-static inline void __array_fill_linspace(array* arr, ...);
+void __array_fill_linspace_int(array* arr, int start, int step);
+void __array_fill_linspace_db(array* arr, double start, double step);
+void __array_fill_linspace(array* arr, ...);
 
-static inline array* array_new(uint64_t size, uint8_t type);
+array* array_new(ulong size, uint type);
 
+#endif /* array.h */
 
 
 
 /*
- *	====================================
- *	FUNCTION DEFINITIONS
- *	====================================
- */
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		IMPLEMENTATION
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+*/
 
-uint64_t __type_bytes(uint8_t type){
+#ifdef ARRAY_IMPLEMENTATION
+
+ulong __type_bytes(uint type){
 	switch(type){
 		case INT: default:
 			return sizeof(int);
@@ -137,46 +155,47 @@ void __array_free(array* arr){
 }
 
 void __array_debug(array* arr){
-	// Data
 	printf("new array at 0x%p\n", arr);
 	printf(" -mem: %d bytes\n", (int)(arr->size*arr->bytes+sizeof(array)));
 	printf(" -size: %d\n", (int)arr->size);
 	printf(" -type: %d\n", (int)arr->type);
 	printf(" -bytes: %d\n", (int)arr->bytes);
 	printf(" -data: 0x%p to 0x%p\n", &arr->data[0], &arr->data[0]+arr->bytes*(arr->size+1)-1);
-	//Function pointers
+	/* Function pointers */
 	printf(" -free_func at 0x%p\n", arr->free);
 	printf(" -fill_func at 0x%p\n", arr->fill);
 	printf(" -print_func at 0x%p\n", arr->print);
 	printf(" -range_func at 0x%p\n", arr->range);
 }
 
-int __array_getval_int(array* arr, uint64_t ind){
+int __array_getval_int(array* arr, ulong ind){
 	return *(int*)(&arr->data[0] + arr->bytes*ind);
 }
 
-double __array_getval_db(array* arr, uint64_t ind){
+double __array_getval_db(array* arr, ulong ind){
 	return *(double*)(&arr->data[0] + arr->bytes*ind);
 }
 
-char* __array_getptr(array* arr, uint64_t ind){
+char* __array_getptr(array* arr, ulong ind){
 	return (char*)(&arr->data[0] + arr->bytes*ind);
 }
 
-void __array_setval_int(array* arr, uint64_t ind, int value){
+void __array_setval_int(array* arr, ulong ind, int value){
 	*(int*)(arr->data + arr->bytes*ind) = value;
 }
 
-void __array_setval_db(array* arr, uint64_t ind, double value){
+void __array_setval_db(array* arr, ulong ind, double value){
 	*(double*)(arr->data + arr->bytes*ind) = value;
 }
 
-
-// ----------------------------------
+/* 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+*/
 
 void __array_print_int(array* arr){
+	uint i;
 	printf("[");
-	for(uint i=0; i!=arr->size; ++i){
+	for(i=0; i!=arr->size; ++i){
 		printf(" %d", __array_getval_int(arr,i));
 	}
 	printf(" ]");
@@ -184,8 +203,9 @@ void __array_print_int(array* arr){
 }
 
 void __array_print_double(array* arr){
+	uint i;
 	printf("[");
-	for(uint i=0; i!=arr->size; ++i){
+	for(i=0; i!=arr->size; ++i){
 		printf(" %g", __array_getval_db(arr,i));
 	}
 	printf(" ]");
@@ -202,17 +222,22 @@ void __array_print(array* arr){
 			break;
 	}
 }
-// ---------------------------------
+
+/* 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+*/
 
 void __array_fill_int(array* arr, int value){
-	for(uint i=0; i!=arr->size; ++i){
+	uint i;
+	for(i=0; i!=arr->size; ++i){
 		int* ptr = (int*)(arr->data + i*arr->bytes);
 		*ptr = value;
 	}
 }
 
 void __array_fill_db(array* arr, double value){
-	for(uint i=0; i!=arr->size; ++i){
+	uint i;
+	for(i=0; i!=arr->size; ++i){
 		double* ptr = (double*)(arr->data + i*arr->bytes);
 		*ptr = value;
 	}
@@ -232,20 +257,26 @@ void __array_fill(array* arr, ...){
 	}
     va_end(args); 
 }
-//------------------------------------
+
+/* 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+*/
 
 void __array_fill_range_int(array* arr, int start, int end){
+	uint i;
+	int extra;
 	double step = (double)(end - start)/(double)arr->size;
-	for(uint i=0; i!=arr->size; ++i){
-		int extra = start + (int)(step*(double)i);
+	for(i=0; i!=arr->size; ++i){
+		extra = start + (int)(step*(double)i);
 		*(int*)(arr->data + i*arr->bytes) = extra;
 	}
 }
 
 void __array_fill_range_db(array* arr, double start, double end){
+	uint i;
 	double val = start;
 	double step = (end - start)/(double)arr->size;
-	for(size_t i=0; i!=arr->size; ++i){
+	for(i=0; i!=arr->size; ++i){
 		*(double*)(arr->data + i*arr->bytes) = val;
 		val += step;
 	}
@@ -264,48 +295,63 @@ void __array_fill_range(array* arr, ...){
 	}
     va_end(args);
 }
-//------------------------------------
 
+/* 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+*/
 
 void __array_fill_linspace_int(array* arr, int start, int step){
-	for(uint i=0; i!=arr->size; ++i){
+	printf("LINSPACE_INT: %d, %d\n", start, step);
+	uint i;
+	for(i=0; i!=arr->size; ++i){
 		arr->seti(arr, i, start);
 		start += step;
 	}
 }
 
 void __array_fill_linspace_db(array* arr, double start, double step){
-	for(uint i=0; i!=arr->size; ++i){
+	uint i;
+	for(i=0; i!=arr->size; ++i){
 		arr->setf(arr, i, start);
 		start += step;
 	}
 }
 
 void __array_fill_linspace(array* arr, ...){
+	int start_i, step_i;
+	double start_db, step_db;
 	va_list args;
+
 	va_start(args, arr);
 	switch(arr->type){
 		case INT:
-			__array_fill_linspace_int(arr, va_arg(args,int), va_arg(args,int));
+			start_i = va_arg(args,int);
+			step_i = va_arg(args,int);
+			__array_fill_linspace_int(arr, start_i, step_i);
 			break;
 		case DOUBLE:
-			__array_fill_linspace_db(arr, va_arg(args,double), va_arg(args,double));
+			start_db = va_arg(args,double);
+			step_db = va_arg(args,double);
+			__array_fill_linspace_db(arr, start_db, step_db);
 			break;
 	}
     va_end(args);
 }
 
-///-----------------------------------
+/* 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+*/
 
 void __array_from_c_array(array* arr, const void* c_arr){
 	memcpy(arr->data, c_arr, arr->bytes*arr->size);
 }
 
-//------------------------------------
+/* 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+*/
 
-
-array* array_new(uint64_t size, uint8_t type){
-	uint64_t bytes;
+array* array_new(ulong size, uint type){
+	ulong bytes;
 	array* arr;
 
 	bytes = __type_bytes(type);
@@ -318,7 +364,7 @@ array* array_new(uint64_t size, uint8_t type){
 	arr->data = calloc(size, bytes);
 	if(!arr->data) return NULL;
 	
-	//Function pointers
+	/* Function pointers */
 	arr->free = &__array_free;
 	arr->fill = &__array_fill;
 	arr->print = &__array_print;
@@ -334,6 +380,10 @@ array* array_new(uint64_t size, uint8_t type){
 	return arr;
 }
 
+#endif /* ARRAY_IMPLEMENTATION */
+
+#ifdef __cplusplus
+}
 #endif
 
 
