@@ -32,6 +32,12 @@ int main(){
 	arr = array_new(100, INT);
 	if(!arr) return 1;
 	arr->linspace(arr, -500, 1);
+
+	printf("Max %d at %d\n", arr->maxi(arr), (int)arr->imax(arr));
+	printf("Min %d at %d\n", arr->mini(arr), (int)arr->imin(arr));
+	printf("Sum: %d\n", arr->sumi(arr));
+	printf("Mean: %g\n", arr->mean(arr));
+
 	arr->print(arr);
 	arr->free(arr);
 
@@ -44,12 +50,10 @@ int main(){
 	/* __array_debug(nums); */
 	nums->range(nums, 3.1415, -0.77);
 	nums->print(nums);
-
-	double sum = 0;
-	uint i;
-	for(i=0; i!=nums->size; ++i)
-		sum += nums->getf(nums,i);
-	printf("Average: %.11g\n", sum/(double)nums->size);
+	printf("Max %g at %d\n", nums->maxf(nums), (int)nums->imax(nums));
+	printf("Min %g at %d\n", nums->minf(nums), (int)nums->imin(nums));
+	printf("Sum: %g\n", nums->sumf(nums));
+	printf("Mean: %g\n", nums->mean(nums));
 	nums->free(nums);
 
 	return 0;
