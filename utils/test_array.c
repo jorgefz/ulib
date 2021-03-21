@@ -2,9 +2,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
-#include <stdarg.h>
-#include <math.h>
 
 #define ARRAY_IMPLEMENTATION
 #include "array.h"
