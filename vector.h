@@ -1,3 +1,5 @@
+
+
 /*
 	======= vector.h =======
 
@@ -58,23 +60,50 @@
 
 */
 
+
+#ifndef VECTOR_H
+#define VECTOR_H 1
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "vector.h"
+
+struct __attribute__((__packed__)) vector__struct {
+	void *d;
+	unsigned int size;
+	unsigned int dtype;
+};
+typedef struct vector__struct vector;
+
+/* Function Prototypes */
+vector *vnew(unsigned int bytes);
+unsigned int vsize(vector *v);
+
+unsigned int vdtype(vector *v);
+void *vdata(vector *v);
+void *vat(vector *v, unsigned int i);
+
+unsigned int vmem(vector *v);
+
+vector *vset(vector *v, unsigned int i, void *src);
+vector *vfill(vector *v, void *src);
+
+vector *vinsert(vector *v, unsigned int j, void *new);
+vector *vdelete(vector *v, unsigned int i);
+vector *vresize(vector *v, unsigned int newsize);
+void vfree(vector *v);
+vector *vtovector(void *arr, unsigned int elem_num, unsigned int elem_size);
+
+#endif
 
 
+#ifdef VECTOR_IMPLEMENTATION
 
-
-/*
-Allocates new vector and returns pointer to it
-*/
-vector *vnew(size_t bytes)
-{
+/* Allocates new vector and returns pointer to it */
+vector *vnew(unsigned int bytes) {
 	vector *v = malloc(sizeof(vector));
-	if(!v)
-		return NULL;
+	if(!v) return NULL;
 	v->d = NULL;
 	v->size = 0;
 	v->dtype = bytes;
@@ -82,145 +111,84 @@ vector *vnew(size_t bytes)
 	return v;
 }
 
-
-//		GETTERS
-
-/*
-Returns the size of the vector
-*/
-size_t vsize(vector *v)
-{
+unsigned int vsize(vector *v){
 	return v->size;
 }
 
-/*
-Returns the memory size of the
-vector members' data type, in bytes
-*/
-size_t vdtype(vector *v)
-{
+unsigned int vdtype(vector *v){
 	return v->dtype;
 }
 
-/* Returns pointer to data array of vector */
-void *vdata(vector *v)
-{
+void *vdata(vector *v){
 	return v->d;
 }
 
-
-/*
-Returns a pointer to a vector member.
-Must be cast to the appropriate data type.
-e.g.
-	double *var = *(double*) vat(v,0)
-returns a pointer to the first member (index 0)
-of a vector 'v' and casts it to a double.
-*/
-void *vat(vector *v, size_t i)
-{
-	if(i >= vsize(v))
-		return NULL;
+void *vat(vector *v, unsigned int i){
+	if(i >= vsize(v)) return NULL;
 	void *ptr = v->d + i*v->dtype;
 	return ptr;
 }
 
-
-/*
-Returns the total memory allocated for the vector
-*/
-size_t vmem(vector *v)
-{
-	if(!v)
-		return 0;
-	if(vsize(v)==0)
-		return sizeof(vector); 
+unsigned int vmem(vector *v){
+	if(!v) return 0;
 	return sizeof(vector)+vsize(v)*vdtype(v);
 }
 
-
-//		SETTERS
-
-/*
-Changes the value of a vector member
-*/
-vector *vset(vector *v, size_t i, void *src)
-{
-	if(i >= vsize(v))
-		return NULL;
+vector *vset(vector *v, unsigned int i, void *src){
+	if(i >= vsize(v)) return NULL;
 	void *dest = vat(v, i);
 	memcpy(dest, src, v->dtype);
 	return v;
 }
 
-/*
-Substitutes every member in the vector with
-the input member
-*/
-vector *vfill(vector *v, void *src)
-{
-	for(size_t i=0; i<vsize(v); i++)
-		vset(v, i, src);
+vector *vfill(vector *v, void *src){
+	unsigned int i;
+	for(i=0; i<vsize(v); i++) vset(v, i, src);
 	return v;
 }
 
+vector *vinsert(vector *v, unsigned int j, void *new){
+	if(j > vsize(v)) return NULL;
 
-
-//		SIZE MANIPULATION
-
-/*
-Inserts a new member into the vector
-at index 'j'.
-*/
-vector *vinsert(vector *v, size_t j, void *new)
-{
-	if(j > vsize(v))
-		return NULL;
-
-	//Reallocate with one extra space
+	/*Reallocate with one extra space*/
 	v->d = realloc(v->d, v->dtype*(v->size+1) );
-	if(v->d == NULL)
-		return NULL;
+	if(v->d == NULL) return NULL;
 	v->size++;
 
-	//Shift values forward from insert index
-	for(size_t i=vsize(v)-1; i>j; i--)
-	{
+	/*Shift values forward from insert index*/
+	unsigned int i;
+	for(i=vsize(v)-1; i>j; i--){
 		void *dest = vat(v, i);
 		void *src = vat(v, i-1);
 		memcpy(dest, src, v->dtype);
 	}
 
-	//Copy new member data from input pointer
+	/*Copy new member data from input pointer*/
 	void *dest = vat(v, j);
 	memcpy(dest, new, v->dtype);
 
 	return v;
 }
 
-/*
-Deletes member 'i' from vector
-*/
-vector *vdelete(vector *v, size_t i)
-{
-	if(i >= vsize(v))
-		return NULL;
+vector *vdelete(vector *v, unsigned int i){
+	if(i >= vsize(v)) return NULL;
 
-	//If there is only one member to delete, free instead
+	/*If there is only one member to delete, free instead*/
 	if(v->size == 1){
 		free(v->d);
 		v->size--;
 		return v;
 	}
 
-	//Shift memory back over deleted member
-	for(size_t j=i; j<vsize(v)-1; j++){
+	/*Shift memory back over deleted member*/
+	unsigned int j;
+	for(j=i; j<vsize(v)-1; j++){
 		void *src = vat(v, j+1);
 		void *dest = vat(v, j);
 		memcpy(dest, src, v->dtype);
 	}
 
-	//Reallocate to reduce memory usage	
+	/*Reallocate to reduce memory usage*/	
 	v->d = realloc(v->d, v->dtype*(v->size-1) );	
 	v->size--;
 	if(!v->d)
@@ -229,13 +197,7 @@ vector *vdelete(vector *v, size_t i)
 	return v;
 }
 
-/*
-Changes the size of a vector directly.
-Increasing the size will generate new empty members,
-and reducing it will erase extra members.
-*/
-vector *vresize(vector *v, size_t newsize)
-{
+vector *vresize(vector *v, unsigned int newsize){
 	v->d = realloc(v->d, sizeof(v->dtype)*newsize);
 	if(v->d == NULL)
 		return NULL;
@@ -243,26 +205,17 @@ vector *vresize(vector *v, size_t newsize)
 	return v;
 }
 
-/*
-Frees the vector
-*/
-void vfree(vector *v)
-{
-	if(!v){
-		return;
-	}
+void vfree(vector *v){
+	if(!v || !v->d) return
 	free(v->d);
 	free(v);
 }
 
-
-/*
-Converts an array into a vector
-*/
-vector *vtovector(void *arr, size_t elem_num, size_t elem_size)
-{
+vector *vtovector(void *arr, unsigned int elem_num, unsigned int elem_size){
 	vector *v = vnew(elem_size);
 	vresize(v, elem_num);
 	memcpy(vdata(v), arr, elem_num*elem_size);
 	return v;
 }
+
+#endif /* VECTOR_IMPLEMENTATION */
