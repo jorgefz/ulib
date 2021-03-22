@@ -8,6 +8,7 @@ This repository contains a small number of single-header libraries that add usef
 * string.h: string container and manipulator.
 * array.h: numeric array of static size.
 * vector.h: generic resizeable container.
+* list.h: doubly-linked list generic container (WIP).
 * arglib.h: command line argument manager.
 * io.h: file input and output (WIP).
 
@@ -61,9 +62,21 @@ This extends the string, inserting an input char array at the location of index 
 string* s->insert(string* s, const char* substr, int j);
 ```
 
+```c
+string* s->append(string* s, const char* substr);
+```
+
 This removes 'n' characters from the string from the location at index 'j', shrinking the string to save memory.
 ```c
 string* s->erase(string* s, int j, unsigned int n);
+```
+
+```c
+string* s->clear(string* s);
+```
+
+```c
+string* s->slice(string* s, int j, int k);
 ```
 
 
@@ -93,7 +106,6 @@ void (*setf)(struct array__struct*, ulong ind, double value);
 int (*geti)(struct array__struct*, ulong ind);
 double (*getf)(struct array__struct*, ulong ind);
 char* (*at)(struct array__struct*, ulong ind);
-
 
 	/* Statistics */
 int (*maxi)(struct array__struct*);

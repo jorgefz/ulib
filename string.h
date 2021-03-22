@@ -26,6 +26,9 @@ v0.1 - 20/03/2021
 	- Editing: insert, erase
 	- Other: free, print
 
+v0.2 - 22/0.3/2021
+	- Editing: append, clear, slice.
+
 */
 
 
@@ -39,14 +42,14 @@ v0.1 - 20/03/2021
 extern "C" {
 #endif
 
-#ifndef STRING_H
-#define STRING_H
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
 #include <math.h>
+
+#ifndef STRING_H
+#define STRING_H
 
 /*
  *	DATA STRUCTURES & MACROS
@@ -63,7 +66,11 @@ struct __attribute__((__packed__)) string__struct {
 	char* (*at)(struct string__struct*, int j);
 	char (*getc)(struct string__struct*, int j);
 	struct string__struct* (*insert)(struct string__struct*, const char* substr, int j);
+	struct string__struct* (*append)(struct string__struct*, const char* substr);
+	
 	struct string__struct* (*erase)(struct string__struct* s, int j, unsigned int n);
+	struct string__struct* (*clear)(struct string__struct* s);
+	struct string__struct* (*slice)(struct string__struct* s, int j, int k);
 };
 typedef struct string__struct string;
 
@@ -81,26 +88,23 @@ void string__print(string* s);
 string* string__copy(string* s);
 
 string* string__insert(string* s, const char* substr, int j);
+string* string__append(string* s, const char* substr);
+
 string* string__erase(string* s, int j, unsigned int n);
+string* string__clear(string* s);
+string* string__slice(string* s, int j, int k);
 
 /*
 
-void clear(string *s) //cleans string to be emtpy
-
-void append(string *s, const char* substr);
-
-void slice(string *s, int from, int to) //reduce string to substring
-
-------------------------------------
-
 void string__find(string* s, const char* substr);
-void string__substr(string* s, int i, int j);
 int string__compare(string* s1, string* s2);
-void string__cat(string* s1, string* s2);
 void string__join(unsigned long num, ...);
 
-remove certain tokens
-remove all whitespaces
+
+string* string__deltoken(string* s, const char* tokens)
+// removes all instances of input tokens
+
+string* string__trim(string* s) //removes trailing whitespaces
 
 separate by tokens
 
@@ -131,8 +135,13 @@ string* string_init(string* s, const char* s_orig){
 	s->getc = &string__getc;
 	s->print = &string__print;
 	s->copy = &string__copy;
+	
 	s->insert = &string__insert;
+	s->append = &string__append;
+
 	s->erase = &string__erase;
+	s->clear = &string__clear;
+	s->slice = &string__slice;
 
 	return s;
 }
@@ -141,7 +150,7 @@ string* string_new(const char* s_orig){
 	string* s;
 	s = malloc(sizeof(string));
 	if(!s) return NULL;
-	return string_init(s, s_orig);
+	return ( string_init(s, s_orig) );
 }
 
 char* string__at(string* s, int j){
@@ -159,6 +168,10 @@ void string__print(string* s){
 }
 
 void string__free(string* s){
+
+	if(!s) printf("s is null\n");
+	if(!s->str) printf("str is null\n");
+
 	free(s->str);
 	free(s);
 }
@@ -175,23 +188,28 @@ string* string__copy(string* s){
 }
 
 string* string__insert(string* s, const char* substr, int j){
+
 	if(j < 0) j = (int)s->length + j + 1;
 	if(j > (int)s->length || j < 0) return NULL;
 
 	unsigned int sslength = strlen(substr);
-
 	char* insptr = s->str + j;
-	char* newstr = realloc(s->str, s->length + sslength + 1);
+
+	char* newstr = realloc(s->str, (s->length + sslength + 1)*sizeof(char) );
 	if(!newstr) return NULL;
-	
+
 	s->str = newstr;
 	s->length += sslength;
 
-	memcpy(insptr + sslength, insptr, s->length - sslength);
+	memcpy(insptr + sslength, insptr, s->length - sslength - j);
 	memcpy(insptr, substr, sslength);
 	*(s->str + s->length) = (char)0;
 
 	return s;
+}
+
+string* string__append(string* s, const char* substr){
+	return ( s->insert(s, substr, s->length) );
 }
 
 string* string__erase(string* s, int j, unsigned int n){
@@ -201,11 +219,25 @@ string* string__erase(string* s, int j, unsigned int n){
 
 	memcpy(s->str+j, s->str+j+n, s->length-j-n);
 
-	char* newstr = realloc(s->str, s->length - n + 1);
+	char *newstr = NULL;
+	newstr = realloc(s->str, s->length - n + 1 );
 	if(!newstr) return NULL;
+
 	s->str = newstr;
 	s->length -= n;
 	*(s->str + s->length) = (char)0;
+	return s;
+}
+
+string* string__clear(string* s){
+	return s->erase(s, 0, s->length+1);
+}
+
+string* string__slice(string* s, int j, int k){
+	unsigned int n;
+	j < 0 ? n = s->length+(unsigned int)j : (n = (unsigned int)j);
+	if( s->erase(s, 0, n) == NULL ) return NULL;
+	if( s->erase(s, k-j, s->length) == NULL) return NULL;
 	return s;
 }
 
