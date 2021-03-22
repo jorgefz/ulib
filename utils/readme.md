@@ -1,43 +1,119 @@
 
-# Utils
+# C-Utils
 
-*Useful functions for the C Programming Language*
+*Useful functions and data structures for the C Programming Language*
 
-Contains several small useful functions for C 
-using only the standard libraries.
-These functions can be classified into:
-* New Data types
-* Memory Management
-* String Manipulation
-* 1D number array manipulation
-* Input / Output (WIP)
+This repository contains a small number of single-header libraries that add useful data structures. The code is fully written in ANSI C (C89).
 
+* string.h: string container and manipulator.
+* array.h: numeric array of static size.
+* vector.h: generic resizeable container.
+* arglib.h: command line argument manager.
+* io.h: file input and output (WIP).
 
+## String.h
 
-## Data Types
-The unsigned integer type is shortened to simply 'uint'.
+Extends functionality of c strings in a similar manner as C++ std::string.
+
+### Initialising
+
+A string may be initialized from a null-terminated `char*` array with `string_new` , which returns a pointer to a `string` structure.
 ```c
-typedef unsigned int uint;
+string* my_string = string_new("Hello, World!");
+```
+The string's length can be retrieved with `my_string->length`, and the underlying char array with `my_string->str`. The predefined string methods can be called with function pointers.
+```c
+string* s->copy(string* s);
 ```
 
-## Memory
-
-### Safe Memory Allocation
-Allocates a number of input bytes using 'malloc'.
-On fail, it prints an error message to stderr
-and exits the program with error code "-1".
-
+### Freeing (destructor)
+To free the string after it is no longer needed, use the following function:
 ```c
-void *ptr = xmalloc(size_t bytes)
+void  s->free(string* s);
+```
+After using this function, the string pointer `my_string` can no longer be used.
+
+### Printing
+```c
+void  s->print(string* s);
+```
+```c
+printf("%s\n", s->str);
 ```
 
-### Safe Memory Freeing
-Attempts to free a pointer. On fail, it prints
-an error message.
+### Getters
+
+This returns a pointer to a specified location in the string, with bounds checking. The input index 'j' can be positive (to indicate an offset from the beginning), or negative (an offset from the end).
 ```c
-void ret_val = xfree(void *ptr)
+char* s->at(string* s, int j);
+```
+For example, `my_string->at(my_string, -1)` returns a char pointer to the last character in the string (before the terminator).
+
+
+Thus fucntion returns a single character at the specified location in the string, which bounds checking. The input index can be both positive or negative.
+```c
+char  s->getc(string* s, int j);
 ```
 
+### String Manipulation
+This extends the string, inserting an input char array at the location of index 'j', which may be positive or negative.
+```c
+string* s->insert(string* s, const char* substr, int j);
+```
+
+This removes 'n' characters from the string from the location at index 'j', shrinking the string to save memory.
+```c
+string* s->erase(string* s, int j, unsigned int n);
+```
+
+
+## Array.h
+
+This section is a Work in Progress.
+
+### Initialisation
+```c
+array* array_new(ulong size, uint type);
+```
+### Array methods:
+```c
+void (*free)(struct array__struct*);
+void (*print)(struct array__struct*);
+
+void (*fill)(struct array__struct*, ...);
+void (*range)(struct array__struct*, ...);
+void (*linspace)(struct array__struct*, ...);
+void (*from_c_array)(struct array__struct*, const void* c_arr);
+
+void (*reverse)(struct array__struct*);
+
+void (*seti)(struct array__struct*, ulong ind, int value);
+void (*setf)(struct array__struct*, ulong ind, double value);
+
+int (*geti)(struct array__struct*, ulong ind);
+double (*getf)(struct array__struct*, ulong ind);
+char* (*at)(struct array__struct*, ulong ind);
+
+
+	/* Statistics */
+int (*maxi)(struct array__struct*);
+double (*maxf)(struct array__struct*);
+int (*mini)(struct array__struct*);
+double (*minf)(struct array__struct*);
+uint (*imax)(struct array__struct*);
+uint (*imin)(struct array__struct*);
+int (*sumi)(struct array__struct*);
+double (*sumf)(struct array__struct*);
+double (*mean)(struct array__struct*);
+	
+```
+
+## Vector.h
+
+This section is a Work in Progress.
+
+
+# Old Functions (IGNORE)
 
 ## Strings
 
