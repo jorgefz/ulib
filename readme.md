@@ -62,23 +62,30 @@ This extends the string, inserting an input char array at the location of index 
 string* s->insert(string* s, const char* substr, int j);
 ```
 
+'Append' inserts an input char array at the end of the string.
 ```c
 string* s->append(string* s, const char* substr);
 ```
 
-This removes 'n' characters from the string from the location at index 'j', shrinking the string to save memory.
+'Erase' removes 'n' characters from the string from the location at index 'j', shrinking the string to save memory.
 ```c
 string* s->erase(string* s, int j, unsigned int n);
 ```
 
+'Clear' removes all characters in the string.
 ```c
 string* s->clear(string* s);
 ```
 
+'Slice' removes all characters from the string, except those between indices 'j' and 'k'.
 ```c
 string* s->slice(string* s, int j, int k);
 ```
 
+'Substr' returns a substring (between indices 'j' and 'k'), leaving the original string untouched. Note that the substring must also be freed to avoid memory leaks.
+```c
+string* s->substr(string* s, int j, int k);
+```
 
 ## Array.h
 

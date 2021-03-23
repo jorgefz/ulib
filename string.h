@@ -27,7 +27,7 @@ v0.1 - 20/03/2021
 	- Other: free, print
 
 v0.2 - 22/0.3/2021
-	- Editing: append, clear, slice.
+	- Editing: append, clear, slice, substr
 
 */
 
@@ -37,10 +37,6 @@ v0.2 - 22/0.3/2021
 		HEADER
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -71,6 +67,7 @@ struct __attribute__((__packed__)) string__struct {
 	struct string__struct* (*erase)(struct string__struct* s, int j, unsigned int n);
 	struct string__struct* (*clear)(struct string__struct* s);
 	struct string__struct* (*slice)(struct string__struct* s, int j, int k);
+	struct string__struct* (*substr)(struct string__struct* s, int j, int k);
 };
 typedef struct string__struct string;
 
@@ -94,19 +91,42 @@ string* string__erase(string* s, int j, unsigned int n);
 string* string__clear(string* s);
 string* string__slice(string* s, int j, int k);
 
+string* string__substr(string* s, int j, int k);
+
 /*
 
-void string__find(string* s, const char* substr);
+void string__reverse(string* s);
+//reverses input string
+
+string* string__trim(string* s);
+//removes trailing whitespaces
+
+int string__find(string* s, const char* substr);
+//Returns index of location of substring, or (-1) otherwise.
+
 int string__compare(string* s1, string* s2);
+//Same as strcmp
+
+int string__equals(string* s1, string *s2);
+//Returns 1 if same, 0 otherwise
+
 void string__join(unsigned long num, ...);
+//last string must be "\0"
 
+int string__ntoken(string* s, const char* tokens)
+//Returns number of occurences of input tokens in string, -1 if none found.
 
-string* string__deltoken(string* s, const char* tokens)
+int string__ftoken(string* s, const char* tokens, int j)
+//Returns index of first occurence of any input token,
+// starting search from given index 'j'.
+// Returns -1 if none found.
+
+string* string__dtoken(string* s, const char* tokens)
 // removes all instances of input tokens
 
-string* string__trim(string* s) //removes trailing whitespaces
-
-separate by tokens
+string* string__split(string* s, const char* tokens)
+//Separates a string by input tokens
+// Returns an array of pointers to substrings
 
 */
 
@@ -142,6 +162,7 @@ string* string_init(string* s, const char* s_orig){
 	s->erase = &string__erase;
 	s->clear = &string__clear;
 	s->slice = &string__slice;
+	s->substr = &string__substr;
 
 	return s;
 }
@@ -242,8 +263,18 @@ string* string__slice(string* s, int j, int k){
 }
 
 
+string* string__substr(string* s, int j, int k){
+	string *substr = s->copy(s);
+	if(!substr) return NULL;
+
+	string* ret = substr->slice(substr, j, k);
+	if(!ret){
+		substr->free(substr);
+		return NULL;
+	}
+
+	return substr;
+}
+
 #endif /* STRING_IMPLEMENTATION */
 
-#ifdef __cplusplus
-}
-#endif

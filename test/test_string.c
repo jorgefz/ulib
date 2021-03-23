@@ -45,7 +45,22 @@ int main(){
 	s->clear(s);
 	s->print(s);
 
+	printf(" -> Remaking string...\n");
+	s->append(s, "Look again at that dot. That's here. That's home. That's us.");
+
+	printf(" -> Substring:\n");
+	string* s2 = s->substr(s, 0, 4);
+	if(!s2){
+		printf("Substring failed\n");
+		return 0;
+	}
+
+	printf("Extracted: '%s'\n", s2->str);
+	printf("From: '%s'\n", s->str);
+	s2->free(s2);
+
 	s->free(s);
+
 
 	return 0;
 }
