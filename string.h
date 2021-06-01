@@ -51,7 +51,7 @@ v0.2 - 22/0.3/2021
  *	DATA STRUCTURES & MACROS
  */
 
-struct __attribute__((__packed__)) string__struct {
+struct string__struct {
 	char* str;
 	unsigned long length;
 

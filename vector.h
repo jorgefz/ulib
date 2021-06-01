@@ -58,6 +58,9 @@
 			
 
 
+%%%%% TO-DO %%%%%
+- Avoid over-usage of getters.
+
 */
 
 
