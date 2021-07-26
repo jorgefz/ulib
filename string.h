@@ -38,14 +38,11 @@ v0.2 - 22/0.3/2021
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <string.h>
-#include <math.h>
 
 #ifndef STRING_H
 #define STRING_H
+
+#include "defs.h"
 
 /*
  *	DATA STRUCTURES & MACROS
@@ -144,10 +141,10 @@ string* string__split(string* s, const char* tokens)
 
 string* string_init(string* s, const char* s_orig){
 
-	s->length = s_orig ? strlen(s_orig) : 0;
+	s->length = s_orig ? ULIB_STRLEN(s_orig) : 0;
 	s->str = calloc(s->length+1, sizeof(char));
 	if(!s->str) return NULL;
-	if(s_orig) strcpy(s->str, s_orig);
+	if(s_orig) ULIB_STRCPY(s->str, s_orig);
 
 	/* Function pointers */
 	s->free = &string__free;
@@ -201,10 +198,10 @@ string* string__copy(string* s){
 	string *new;
 	new = malloc(sizeof(string));
 	if(!new) return NULL;
-	memcpy(new, s, sizeof(string));
+	ULIB_MEMCPY(new, s, sizeof(string));
 	new->str = malloc(s->length+1);
 	if(!new->str) return NULL;
-	memcpy(new->str, s->str, s->length+1);
+	ULIB_MEMCPY(new->str, s->str, s->length+1);
 	return new;
 }
 
@@ -213,7 +210,7 @@ string* string__insert(string* s, const char* substr, int j){
 	if(j < 0) j = (int)s->length + j + 1;
 	if(j > (int)s->length || j < 0) return NULL;
 
-	unsigned int sslength = strlen(substr);
+	unsigned int sslength = ULIB_STRLEN(substr);
 	char* insptr = s->str + j;
 
 	char* newstr = realloc(s->str, (s->length + sslength + 1)*sizeof(char) );
@@ -222,8 +219,8 @@ string* string__insert(string* s, const char* substr, int j){
 	s->str = newstr;
 	s->length += sslength;
 
-	memcpy(insptr + sslength, insptr, s->length - sslength - j);
-	memcpy(insptr, substr, sslength);
+	ULIB_MEMCPY(insptr + sslength, insptr, s->length - sslength - j);
+	ULIB_MEMCPY(insptr, substr, sslength);
 	*(s->str + s->length) = (char)0;
 
 	return s;
@@ -238,7 +235,7 @@ string* string__erase(string* s, int j, unsigned int n){
 	if(j > (int)s->length || j < 0) return NULL;
 	if(j+(int)n > (int)s->length) n = s->length - j;
 
-	memcpy(s->str+j, s->str+j+n, s->length-j-n);
+	ULIB_MEMCPY(s->str+j, s->str+j+n, s->length-j-n);
 
 	char *newstr = NULL;
 	newstr = realloc(s->str, s->length - n + 1 );

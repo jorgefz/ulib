@@ -2,7 +2,7 @@
 #ifndef UTILS_IO_H
 #define UTILS_IO_H
 
-struct __attribute__((__packed__)) infile__struct {
+struct infile__struct {
 	const char path[100];
 };
 typedef struct infile__struct infile;

@@ -1,16 +1,14 @@
 
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #define ARRAY_IMPLEMENTATION
 #include "../array.h"
 
+#include <stdio.h>
 
 int main(){
 
 	/* array of integers */
-	array *arr = array_new(10, INT);
+	array *arr = array_new(10, ARRAY_INT);
 	if(!arr){
 		printf("Error!\n");
 		return 1;
@@ -26,7 +24,7 @@ int main(){
 	arr->print(arr);
 	arr->free(arr);
 
-	arr = array_new(100, INT);
+	arr = array_new(100, ARRAY_INT);
 	if(!arr) return 1;
 	arr->linspace(arr, -500, 1);
 
@@ -39,7 +37,7 @@ int main(){
 	arr->free(arr);
 
 	/* array of doubles */
-	array* nums = array_new(6, DOUBLE);
+	array* nums = array_new(6, ARRAY_DOUBLE);
 	if(!nums){
 		fprintf(stderr, "Error!\n");
 		return 1;

@@ -8,6 +8,7 @@ This repository contains a small number of single-header libraries that add usef
 * string.h: string container and manipulator.
 * array.h: numeric array of static size.
 * vector.h: generic resizeable container.
+* dict.h: dictionary data structure (WIP).
 * list.h: doubly-linked list generic container (WIP).
 * arglib.h: command line argument manager.
 * io.h: file input and output (WIP).

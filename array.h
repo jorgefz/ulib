@@ -51,32 +51,21 @@ Planned
 		HEADER
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #ifndef ARRAY_H
 #define ARRAY_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <math.h>
-#include <string.h>
+#include "defs.h"
+
 
 /*
  *	DATA STRUCTURES & MACROS
  */
-typedef unsigned int uint;
-typedef unsigned char uchar;
-typedef unsigned long ulong;
 
-struct __attribute__((__packed__)) array__struct {
+struct array__struct {
 	char* data;
-	ulong size;
-	uint type;
-	ulong bytes; /* size in bytes of each member */
+	unsigned long size;
+	unsigned int type;
+	unsigned long bytes; /* size in bytes of each member */
 
 	/* Function pointers */
 	void (*free)(struct array__struct*);
@@ -87,20 +76,20 @@ struct __attribute__((__packed__)) array__struct {
 	void (*linspace)(struct array__struct*, ...);
 	void (*from_c_array)(struct array__struct*, const void* c_arr);
 
-	void (*seti)(struct array__struct*, ulong ind, int value);
-	void (*setf)(struct array__struct*, ulong ind, double value);
+	void (*seti)(struct array__struct*, unsigned long ind, int value);
+	void (*setf)(struct array__struct*, unsigned long ind, double value);
 
-	int (*geti)(struct array__struct*, ulong ind);
-	double (*getf)(struct array__struct*, ulong ind);
-	char* (*at)(struct array__struct*, ulong ind);
+	int (*geti)(struct array__struct*, unsigned long ind);
+	double (*getf)(struct array__struct*, unsigned long ind);
+	char* (*at)(struct array__struct*, unsigned long ind);
 
 	/* stats */
 	int (*maxi)(struct array__struct*);
 	double (*maxf)(struct array__struct*);
 	int (*mini)(struct array__struct*);
 	double (*minf)(struct array__struct*);
-	uint (*imax)(struct array__struct*);
-	uint (*imin)(struct array__struct*);
+	unsigned int (*imax)(struct array__struct*);
+	unsigned int (*imin)(struct array__struct*);
 	int (*sumi)(struct array__struct*);
 	double (*sumf)(struct array__struct*);
 	double (*mean)(struct array__struct*);
@@ -111,7 +100,7 @@ struct __attribute__((__packed__)) array__struct {
 typedef struct array__struct array;
 
 enum array__types {
-	INT, DOUBLE
+	ARRAY_INT, ARRAY_DOUBLE
 }; /* Supported types */
 
 
@@ -119,18 +108,18 @@ enum array__types {
  *	FUNCTION DECLARATIONS
  */
 
-ulong array__type_bytes(uint type);
+unsigned long array__type_bytes(unsigned int type);
 
-array* array_new(ulong size, uint type);
+array* array_new(unsigned long size, unsigned int type);
 void array__free(array* arr);
 void array__debug(array* arr);
 void array__from_c_array(array* arr, const void* c_arr);   
 
-int     array__getval_int(array* arr, ulong ind);
-double  array__getval_db(array* arr, ulong ind);
-char*   array__getptr(array* arr, ulong ind);
-void    array__setval_int(array* arr, ulong ind, int value);
-void    array__setval_db(array* arr, ulong ind, double value);
+int     array__getval_int(array* arr, unsigned long ind);
+double  array__getval_db(array* arr, unsigned long ind);
+char*   array__getptr(array* arr, unsigned long ind);
+void    array__setval_int(array* arr, unsigned long ind, int value);
+void    array__setval_db(array* arr, unsigned long ind, double value);
 
 void array__print_int(array* arr);
 void array__print_double(array* arr);
@@ -157,13 +146,13 @@ double array__max_db(array* arr);
 int array__min_int(array* arr);
 double array__min_db(array* arr);
 
-uint array__imax_int(array* arr);
-uint array__imax_db(array* arr);
-uint array__imax(array* arr);
+unsigned int array__imax_int(array* arr);
+unsigned int array__imax_db(array* arr);
+unsigned int array__imax(array* arr);
 
-uint array__imin_int(array* arr);
-uint array__imin_db(array* arr);
-uint array__imin(array* arr);
+unsigned int array__imin_int(array* arr);
+unsigned int array__imin_db(array* arr);
+unsigned int array__imin(array* arr);
 
 int array__sum_int(array* arr);
 double array__sum_db(array* arr);
@@ -188,12 +177,12 @@ void array__reverse(array* arr);
 #ifdef ARRAY_IMPLEMENTATION
 
 
-array* array_new(ulong size, uint type){
-	ulong bytes;
+array* array_new(unsigned long size, unsigned int type){
+	unsigned long bytes;
 	array* arr;
 
 	bytes = array__type_bytes(type);
-	arr = malloc(sizeof(array));
+	arr = ULIB_MALLOC(sizeof(array));
 	if(!arr) return NULL;
 
 	arr->size = size;
@@ -232,11 +221,11 @@ array* array_new(ulong size, uint type){
 	return arr;
 }
 
-ulong array__type_bytes(uint type){
+unsigned long array__type_bytes(unsigned int type){
 	switch(type){
-		case INT: default:
+		case ARRAY_INT: default:
 			return sizeof(int);
-		case DOUBLE:
+		case ARRAY_DOUBLE:
 			return sizeof(double);
 	}
 }
@@ -247,31 +236,31 @@ void array__free(array* arr){
 }
 
 void array__debug(array* arr){
-	printf("new array at 0x%p\n", arr);
-	printf(" -mem: %d bytes\n", (int)(arr->size*arr->bytes+sizeof(array)));
-	printf(" -size: %d elements\n", (int)arr->size);
-	printf(" -type: %d\n", (int)arr->type);
-	printf(" -element bytes: %d\n", (int)arr->bytes);
-	printf(" -data: 0x%p to 0x%p\n", &arr->data[0], &arr->data[0]+arr->bytes*(arr->size+1)-1);
+	ULIB_PRINTF("new array at 0x%p\n", arr);
+	ULIB_PRINTF(" -mem: %d bytes\n", (int)(arr->size*arr->bytes+sizeof(array)));
+	ULIB_PRINTF(" -size: %d elements\n", (int)arr->size);
+	ULIB_PRINTF(" -type: %d\n", (int)arr->type);
+	ULIB_PRINTF(" -element bytes: %d\n", (int)arr->bytes);
+	ULIB_PRINTF(" -data: 0x%p to 0x%p\n", &arr->data[0], &arr->data[0]+arr->bytes*(arr->size+1)-1);
 }
 
-int array__getval_int(array* arr, ulong ind){
+int array__getval_int(array* arr, unsigned long ind){
 	return *(int*)(&arr->data[0] + arr->bytes*ind);
 }
 
-double array__getval_db(array* arr, ulong ind){
+double array__getval_db(array* arr, unsigned long ind){
 	return *(double*)(&arr->data[0] + arr->bytes*ind);
 }
 
-char* array__getptr(array* arr, ulong ind){
+char* array__getptr(array* arr, unsigned long ind){
 	return (char*)(&arr->data[0] + arr->bytes*ind);
 }
 
-void array__setval_int(array* arr, ulong ind, int value){
+void array__setval_int(array* arr, unsigned long ind, int value){
 	*(int*)(arr->data + arr->bytes*ind) = value;
 }
 
-void array__setval_db(array* arr, ulong ind, double value){
+void array__setval_db(array* arr, unsigned long ind, double value){
 	*(double*)(arr->data + arr->bytes*ind) = value;
 }
 
@@ -280,31 +269,31 @@ void array__setval_db(array* arr, ulong ind, double value){
 */
 
 void array__print_int(array* arr){
-	uint i;
-	printf("[");
+	unsigned int i;
+	ULIB_PRINTF("[");
 	for(i=0; i!=arr->size; ++i){
-		printf(" %d", array__getval_int(arr,i));
+		ULIB_PRINTF(" %d", array__getval_int(arr,i));
 	}
-	printf(" ]");
-	printf("\n");
+	ULIB_PRINTF(" ]");
+	ULIB_PRINTF("\n");
 }
 
 void array__print_double(array* arr){
-	uint i;
-	printf("[");
+	unsigned int i;
+	ULIB_PRINTF("[");
 	for(i=0; i!=arr->size; ++i){
-		printf(" %g", array__getval_db(arr,i));
+		ULIB_PRINTF(" %g", array__getval_db(arr,i));
 	}
-	printf(" ]");
-	printf("\n");
+	ULIB_PRINTF(" ]");
+	ULIB_PRINTF("\n");
 }
 
 void array__print(array* arr){
 	switch(arr->type){
-		case INT:
+		case ARRAY_INT:
 			array__print_int(arr);
 			break;
-		case DOUBLE:
+		case ARRAY_DOUBLE:
 			array__print_double(arr);
 			break;
 	}
@@ -315,7 +304,7 @@ void array__print(array* arr){
 */
 
 void array__fill_int(array* arr, int value){
-	uint i;
+	unsigned int i;
 	for(i=0; i!=arr->size; ++i){
 		int* ptr = (int*)(arr->data + i*arr->bytes);
 		*ptr = value;
@@ -323,7 +312,7 @@ void array__fill_int(array* arr, int value){
 }
 
 void array__fill_db(array* arr, double value){
-	uint i;
+	unsigned int i;
 	for(i=0; i!=arr->size; ++i){
 		double* ptr = (double*)(arr->data + i*arr->bytes);
 		*ptr = value;
@@ -331,18 +320,18 @@ void array__fill_db(array* arr, double value){
 }
 
 void array__fill(array* arr, ...){
-	va_list args;
-	va_start(args,arr);
+	ULIB_VA_LIST args;
+	ULIB_VA_START(args,arr);
 	
 	switch(arr->type){
-		case INT:
-			array__fill_int(arr, va_arg(args,int));
+		case ARRAY_INT:
+			array__fill_int(arr, ULIB_VA_ARG(args,int));
 			break;
-		case DOUBLE:
-			array__fill_db(arr, va_arg(args,double));
+		case ARRAY_DOUBLE:
+			array__fill_db(arr, ULIB_VA_ARG(args,double));
 			break;
 	}
-    va_end(args); 
+    ULIB_VA_END(args); 
 }
 
 /* 
@@ -350,7 +339,7 @@ void array__fill(array* arr, ...){
 */
 
 void array__fill_range_int(array* arr, int start, int end){
-	uint i;
+	unsigned int i;
 	int extra;
 	double step = (double)(end - start)/(double)arr->size;
 	for(i=0; i!=arr->size; ++i){
@@ -360,7 +349,7 @@ void array__fill_range_int(array* arr, int start, int end){
 }
 
 void array__fill_range_db(array* arr, double start, double end){
-	uint i;
+	unsigned int i;
 	double val = start;
 	double step = (end - start)/(double)arr->size;
 	for(i=0; i!=arr->size; ++i){
@@ -370,17 +359,17 @@ void array__fill_range_db(array* arr, double start, double end){
 }
 
 void array__fill_range(array* arr, ...){
-	va_list args;
-	va_start(args,arr);
+	ULIB_VA_LIST args;
+	ULIB_VA_START(args,arr);
 	switch(arr->type){
-		case INT:
-			array__fill_range_int(arr, va_arg(args,int), va_arg(args,int));
+		case ARRAY_INT:
+			array__fill_range_int(arr, ULIB_VA_ARG(args,int), ULIB_VA_ARG(args,int));
 			break;
-		case DOUBLE:
-			array__fill_range_db(arr, va_arg(args,double), va_arg(args,double));
+		case ARRAY_DOUBLE:
+			array__fill_range_db(arr, ULIB_VA_ARG(args,double), ULIB_VA_ARG(args,double));
 			break;
 	}
-    va_end(args);
+    ULIB_VA_END(args);
 }
 
 /* 
@@ -388,8 +377,8 @@ void array__fill_range(array* arr, ...){
 */
 
 void array__fill_linspace_int(array* arr, int start, int step){
-	printf("LINSPACE_INT: %d, %d\n", start, step);
-	uint i;
+	ULIB_PRINTF("LINSPACE_INT: %d, %d\n", start, step);
+	unsigned int i;
 	for(i=0; i!=arr->size; ++i){
 		arr->seti(arr, i, start);
 		start += step;
@@ -397,7 +386,7 @@ void array__fill_linspace_int(array* arr, int start, int step){
 }
 
 void array__fill_linspace_db(array* arr, double start, double step){
-	uint i;
+	unsigned int i;
 	for(i=0; i!=arr->size; ++i){
 		arr->setf(arr, i, start);
 		start += step;
@@ -407,22 +396,22 @@ void array__fill_linspace_db(array* arr, double start, double step){
 void array__fill_linspace(array* arr, ...){
 	int start_i, step_i;
 	double start_db, step_db;
-	va_list args;
+	ULIB_VA_LIST args;
 
-	va_start(args, arr);
+	ULIB_VA_START(args, arr);
 	switch(arr->type){
-		case INT:
-			start_i = va_arg(args,int);
-			step_i = va_arg(args,int);
+		case ARRAY_INT:
+			start_i = ULIB_VA_ARG(args,int);
+			step_i = ULIB_VA_ARG(args,int);
 			array__fill_linspace_int(arr, start_i, step_i);
 			break;
-		case DOUBLE:
-			start_db = va_arg(args,double);
-			step_db = va_arg(args,double);
+		case ARRAY_DOUBLE:
+			start_db = ULIB_VA_ARG(args,double);
+			step_db = ULIB_VA_ARG(args,double);
 			array__fill_linspace_db(arr, start_db, step_db);
 			break;
 	}
-    va_end(args);
+    ULIB_VA_END(args);
 }
 
 /* 
@@ -430,7 +419,7 @@ void array__fill_linspace(array* arr, ...){
 */
 
 void array__from_c_array(array* arr, const void* c_arr){
-	memcpy(arr->data, c_arr, arr->bytes*arr->size);
+	ULIB_MEMCPY(arr->data, c_arr, arr->bytes*arr->size);
 }
 
 /* 
@@ -439,7 +428,7 @@ void array__from_c_array(array* arr, const void* c_arr){
 
 int array__max_int(array* arr){
 	int max = arr->geti(arr,0);
-	uint i;
+	unsigned int i;
 	for(i=0; i!=arr->size; ++i){
 		if(max < arr->geti(arr,i)) max = arr->geti(arr,i);
 	}
@@ -448,7 +437,7 @@ int array__max_int(array* arr){
 
 double array__max_db(array* arr){
 	double max = arr->getf(arr,0);
-	uint i;
+	unsigned int i;
 	for(i=0; i!=arr->size; ++i){
 		if(max < arr->getf(arr,i)) max = arr->getf(arr,i);
 	}
@@ -457,7 +446,7 @@ double array__max_db(array* arr){
 
 int array__min_int(array* arr){
 	int min = arr->geti(arr,0);
-	uint i;
+	unsigned int i;
 	for(i=0; i!=arr->size; ++i){
 		if(min > arr->geti(arr,i)) min = arr->geti(arr,i);
 	}
@@ -466,15 +455,15 @@ int array__min_int(array* arr){
 
 double array__min_db(array* arr){
 	double min = arr->getf(arr,0);
-	uint i;
+	unsigned int i;
 	for(i=0; i!=arr->size; ++i){
 		if(min > arr->getf(arr,i)) min = arr->getf(arr,i);
 	}
 	return min;
 }
 
-uint array__imax_int(array* arr){
-	uint i, j = 0;
+unsigned int array__imax_int(array* arr){
+	unsigned int i, j = 0;
 	int max = arr->geti(arr,0);
 	for(i=0; i!=arr->size; ++i){
 		if(max < arr->geti(arr,i)){
@@ -485,8 +474,8 @@ uint array__imax_int(array* arr){
 	return j;
 }
 
-uint array__imax_db(array* arr){
-	uint i, j = 0;
+unsigned int array__imax_db(array* arr){
+	unsigned int i, j = 0;
 	double max = arr->getf(arr,0);
 	for(i=0; i!=arr->size; ++i){
 		if(max < arr->getf(arr,i)){
@@ -497,18 +486,18 @@ uint array__imax_db(array* arr){
 	return j;
 }
 
-uint array__imax(array* arr){
+unsigned int array__imax(array* arr){
 	switch(arr->type){
-		case INT: default:
+		case ARRAY_INT: default:
 			return array__imax_int(arr);
-		case DOUBLE:
+		case ARRAY_DOUBLE:
 			return array__imax_db(arr);
 	}
 }
 
 
-uint array__imin_int(array* arr){
-	uint i, j = 0;
+unsigned int array__imin_int(array* arr){
+	unsigned int i, j = 0;
 	int min = arr->geti(arr,0);
 	for(i=0; i!=arr->size; ++i){
 		if(min > arr->geti(arr,i)){
@@ -519,8 +508,8 @@ uint array__imin_int(array* arr){
 	return j;
 }
 
-uint array__imin_db(array* arr){
-	uint i, j = 0;
+unsigned int array__imin_db(array* arr){
+	unsigned int i, j = 0;
 	double min = arr->getf(arr,0);
 	for(i=0; i!=arr->size; ++i){
 		if(min > arr->getf(arr,i)){
@@ -531,25 +520,25 @@ uint array__imin_db(array* arr){
 	return j;
 }
 
-uint array__imin(array* arr){
+unsigned int array__imin(array* arr){
 	switch(arr->type){
-		case INT: default:
+		case ARRAY_INT: default:
 			return array__imin_int(arr);
-		case DOUBLE:
+		case ARRAY_DOUBLE:
 			return array__imin_db(arr);
 	}
 }
 
 int array__sum_int(array* arr){
 	int sum = 0;
-	uint i;
+	unsigned int i;
 	for(i=0; i!=arr->size; ++i) sum += arr->geti(arr,i);
 	return sum;
 }
 
 double array__sum_db(array* arr){
 	double sum = 0;
-	uint i;
+	unsigned int i;
 	for(i=0; i!=arr->size; ++i) sum += arr->getf(arr,i);
 	return sum;
 }
@@ -564,15 +553,15 @@ double array__mean_db(array* arr){
 
 double array__mean(array* arr){
 	switch(arr->type){
-		case INT: default:
+		case ARRAY_INT: default:
 			return array__mean_int(arr);
-		case DOUBLE:
+		case ARRAY_DOUBLE:
 			return array__mean_db(arr);
 	}
 }
 
 void array__reverse(array* arr){
-	printf("WIP array->reverse (%u)\n", (uint)arr->size);
+	ULIB_PRINTF("WIP array->reverse (%u)\n", (unsigned int)arr->size);
 }
 
 
@@ -582,10 +571,6 @@ void array__reverse(array* arr){
 
 
 #endif /* ARRAY_IMPLEMENTATION */
-
-#ifdef __cplusplus
-}
-#endif
 
 
 /*

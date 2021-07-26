@@ -1,11 +1,11 @@
 #ifndef LIST_H
 #define LIST_H
 
-struct __attribute__((__packed__)) list__struct {
+struct list__struct {
 	struct list__struct* _next_ptr;
 	struct list__struct* _prev_ptr;
-	int size;
-	void* data;
+	int _len;
+	void* _data;
 };
 typedef struct list__struct list;
 

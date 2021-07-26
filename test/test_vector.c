@@ -1,33 +1,31 @@
 
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #define VECTOR_IMPLEMENTATION
 #include "../vector.h"
 
+#include <stdio.h>
 
 int main(){
 
-	vector* v = vnew(sizeof(int));
-	int f = 99;
-	vresize(v, 9);
-	vfill(v, &f);
+	vector* v = vector_new(sizeof(int));
 
-	printf("vector size is %u\n", vsize(v));
+	int f = 99;
+	v->resize(v, 9);
+	v->fill(v, &f);
+
+	printf("vector size is %u\n", v->length(v));
 
 	unsigned int i;
-	for(i=0; i!=vsize(v); ++i) printf("%d ", *(int*)vat(v,i));
+	for(i=0; i!=v->length(v); ++i) printf("%d ", *(int*)v->at(v,i));
 	printf("\n");
 	
 	int n = 88;
-	vinsert(v, 4, &n);
+	v->insert(v, 4, &n);
 
-	for(i=0; i!=vsize(v); ++i) printf("%d ", *(int*)vat(v,i));
+	for(i=0; i!=v->length(v); ++i) printf("%d ", *(int*)v->at(v,i));
 	printf("\n");
 
-	vfree(v);
+	v->free(v);
 
 	return 0;
 }

@@ -8,30 +8,30 @@
 	for any data type and structure.
 
 	To create a new vector, use:
-		vector *v = vnew( sizeof(T) );
+		vector *v = vector_new( sizeof(T) );
 	where T is the data type of its members.
 
 	To insert a new member 'var' at index 0, use:
-		vinsert( v, 0, &var );
+		v->insert( v, 0, &var );
 
 	To retrieve the current vector size, use:
-		vsize(v);
+		v->length(v);
 
 	To delete a vector member at index 'i', use:
-		vdelete( v, i);
+		v->delete( v, i);
 
 	To retrieve a pointer to a specific member
 	at index 'i', use:
-		T *ptr = vat( v, i );
+		T *ptr = v->at( v, i );
 
 	To free a vector, use:
-		vfree(v);
+		v->free(v);
 
 	To resize a vector to a given size, use:
-		vresize(v, size);
+		v->resize(v, size);
 
 	To fill every vector member with the same item, use:
-		vfill(v, &item);
+		v->fill(v, &item);
 
 
 
@@ -40,7 +40,7 @@
 
 	1.0 - 19/07/2020
 		- Added basic vector functions:
-		vnew, vfree, vsize, vat,
+		vnew, vfree, v->length, vat,
 		vinsert, vdelete.
 		- Added functions to aid vector manipulation
 		vdtype, vresize, vfill
@@ -55,7 +55,16 @@
 	1.2 - 29/10/2020
 		- Added vtovector to convert conventional
 			array to vector
-			
+
+	1.3 - 25/07/2021
+		- Removed dependency on standard library
+		- User can define own implementation of
+		memory allocation with ULIB_MALLOC
+		and ULIB_REALLOC
+		- User can define own implementation of
+		memcpy by defining ULIB_MEMCPY
+		- Migrated vector functions to struct methods
+		(function pointers).
 
 
 %%%%% TO-DO %%%%%
@@ -67,36 +76,49 @@
 #ifndef VECTOR_H
 #define VECTOR_H 1
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "defs.h"
 
 
-struct __attribute__((__packed__)) vector__struct {
+struct vector__struct {
+	struct string__struct* (*substr)(struct string__struct* s, int j, int k);
+
 	void *d;
-	unsigned int size;
+	unsigned int len;
 	unsigned int dtype;
+	/* Methods */
+	unsigned int (*length)(struct vector__struct*);
+	unsigned int (*elem_size)(struct vector__struct*);
+	void* (*data)(struct vector__struct*);
+	void* (*at)(struct vector__struct*, unsigned int);
+	unsigned int (*mem)(struct vector__struct*);
+	struct vector__struct* (*set)(struct vector__struct*, unsigned int, void*);
+	struct vector__struct* (*fill)(struct vector__struct*, void*);
+	struct vector__struct* (*insert)(struct vector__struct*, unsigned int, void*);
+	struct vector__struct* (*delete)(struct vector__struct*, unsigned int);
+	struct vector__struct* (*resize)(struct vector__struct*, unsigned int);
+	struct vector__struct* (*from_array)(void*, unsigned int, unsigned int);
+	void (*free)(struct vector__struct*);
 };
 typedef struct vector__struct vector;
 
-/* Function Prototypes */
-vector *vnew(unsigned int bytes);
-unsigned int vsize(vector *v);
+/* Function Declarations */
+vector *vector_new(unsigned int bytes);
+unsigned int vector__length(vector *v);
 
-unsigned int vdtype(vector *v);
-void *vdata(vector *v);
-void *vat(vector *v, unsigned int i);
+unsigned int vector__dtype(vector *v);
+void *vector__data(vector *v);
+void *vector__at(vector *v, unsigned int i);
 
-unsigned int vmem(vector *v);
+unsigned int vector__mem(vector *v);
 
-vector *vset(vector *v, unsigned int i, void *src);
-vector *vfill(vector *v, void *src);
+vector *vector__set(vector *v, unsigned int i, void *src);
+vector *vector__fill(vector *v, void *src);
 
-vector *vinsert(vector *v, unsigned int j, void *new);
-vector *vdelete(vector *v, unsigned int i);
-vector *vresize(vector *v, unsigned int newsize);
-void vfree(vector *v);
-vector *vtovector(void *arr, unsigned int elem_num, unsigned int elem_size);
+vector *vector__insert(vector *v, unsigned int j, void *new);
+vector *vector__delete(vector *v, unsigned int i);
+vector *vector__resize(vector *v, unsigned int newsize);
+void vector__free(vector *v);
+vector *vector__from_array(void *arr, unsigned int elem_num, unsigned int elem_size);
 
 #endif
 
@@ -104,120 +126,134 @@ vector *vtovector(void *arr, unsigned int elem_num, unsigned int elem_size);
 #ifdef VECTOR_IMPLEMENTATION
 
 /* Allocates new vector and returns pointer to it */
-vector *vnew(unsigned int bytes) {
-	vector *v = malloc(sizeof(vector));
+vector *vector_new(unsigned int bytes) {
+	vector *v = ULIB_MALLOC(sizeof(vector));
 	if(!v) return NULL;
+	/* Variables */
 	v->d = NULL;
-	v->size = 0;
+	v->len = 0;
 	v->dtype = bytes;
+	/* Methods */
+	v->length = vector__length;
+	v->elem_size = vector__dtype;
+	v->data = vector__data;
+	v->at = vector__at;
+	v->mem = vector__mem;
+	v->set = vector__set;
+	v->fill = vector__fill;
+	v->insert = vector__insert;
+	v->delete = vector__delete;
+	v->resize = vector__resize;
+	v->from_array = vector__from_array;
+	v->free = vector__free;
 
 	return v;
 }
 
-unsigned int vsize(vector *v){
-	return v->size;
+unsigned int vector__length(vector *v){
+	return v->len;
 }
 
-unsigned int vdtype(vector *v){
+unsigned int vector__dtype(vector *v){
 	return v->dtype;
 }
 
-void *vdata(vector *v){
+void *vector__data(vector *v){
 	return v->d;
 }
 
-void *vat(vector *v, unsigned int i){
-	if(i >= vsize(v)) return NULL;
+void *vector__at(vector *v, unsigned int i){
+	if(i >= v->length(v)) return NULL;
 	void *ptr = v->d + i*v->dtype;
 	return ptr;
 }
 
-unsigned int vmem(vector *v){
+unsigned int vector__mem(vector *v){
 	if(!v) return 0;
-	return sizeof(vector)+vsize(v)*vdtype(v);
+	return sizeof(vector)+v->length(v)*v->dtype;
 }
 
-vector *vset(vector *v, unsigned int i, void *src){
-	if(i >= vsize(v)) return NULL;
-	void *dest = vat(v, i);
-	memcpy(dest, src, v->dtype);
+vector *vector__set(vector *v, unsigned int i, void *src){
+	if(i >= v->length(v)) return NULL;
+	void *dest = v->at(v, i);
+	ULIB_MEMCPY(dest, src, v->dtype);
 	return v;
 }
 
-vector *vfill(vector *v, void *src){
+vector *vector__fill(vector *v, void *src){
 	unsigned int i;
-	for(i=0; i<vsize(v); i++) vset(v, i, src);
+	for(i=0; i<v->length(v); i++) v->set(v, i, src);
 	return v;
 }
 
-vector *vinsert(vector *v, unsigned int j, void *new){
-	if(j > vsize(v)) return NULL;
+vector *vector__insert(vector *v, unsigned int j, void *new){
+	if(j > v->length(v)) return NULL;
 
 	/*Reallocate with one extra space*/
-	v->d = realloc(v->d, v->dtype*(v->size+1) );
+	v->d = ULIB_REALLOC(v->d, v->dtype*(v->len+1) );
 	if(v->d == NULL) return NULL;
-	v->size++;
+	v->len++;
 
 	/*Shift values forward from insert index*/
 	unsigned int i;
-	for(i=vsize(v)-1; i>j; i--){
-		void *dest = vat(v, i);
-		void *src = vat(v, i-1);
-		memcpy(dest, src, v->dtype);
+	for(i=v->length(v)-1; i>j; i--){
+		void *dest = v->at(v, i);
+		void *src = v->at(v, i-1);
+		ULIB_MEMCPY(dest, src, v->dtype);
 	}
 
 	/*Copy new member data from input pointer*/
-	void *dest = vat(v, j);
-	memcpy(dest, new, v->dtype);
+	void *dest = v->at(v, j);
+	ULIB_MEMCPY(dest, new, v->dtype);
 
 	return v;
 }
 
-vector *vdelete(vector *v, unsigned int i){
-	if(i >= vsize(v)) return NULL;
+vector *vector__delete(vector *v, unsigned int i){
+	if(i >= v->length(v)) return NULL;
 
 	/*If there is only one member to delete, free instead*/
-	if(v->size == 1){
+	if(v->len == 1){
 		free(v->d);
-		v->size--;
+		v->len--;
 		return v;
 	}
 
 	/*Shift memory back over deleted member*/
 	unsigned int j;
-	for(j=i; j<vsize(v)-1; j++){
-		void *src = vat(v, j+1);
-		void *dest = vat(v, j);
-		memcpy(dest, src, v->dtype);
+	for(j=i; j<v->length(v)-1; j++){
+		void *src = v->at(v, j+1);
+		void *dest = v->at(v, j);
+		ULIB_MEMCPY(dest, src, v->dtype);
 	}
 
 	/*Reallocate to reduce memory usage*/	
-	v->d = realloc(v->d, v->dtype*(v->size-1) );	
-	v->size--;
+	v->d = ULIB_REALLOC(v->d, v->dtype*(v->len-1) );	
+	v->len--;
 	if(!v->d)
 		return NULL;
 
 	return v;
 }
 
-vector *vresize(vector *v, unsigned int newsize){
-	v->d = realloc(v->d, sizeof(v->dtype)*newsize);
+vector *vector__resize(vector *v, unsigned int newsize){
+	v->d = ULIB_REALLOC(v->d, sizeof(v->dtype)*newsize);
 	if(v->d == NULL)
 		return NULL;
-	v->size = newsize;
+	v->len = newsize;
 	return v;
 }
 
-void vfree(vector *v){
+void vector__free(vector *v){
 	if(!v || !v->d) return
 	free(v->d);
 	free(v);
 }
 
-vector *vtovector(void *arr, unsigned int elem_num, unsigned int elem_size){
-	vector *v = vnew(elem_size);
-	vresize(v, elem_num);
-	memcpy(vdata(v), arr, elem_num*elem_size);
+vector *vector__from_array(void *arr, unsigned int elem_num, unsigned int elem_size){
+	vector *v = vector_new(elem_size);
+	v->resize(v, elem_num);
+	ULIB_MEMCPY(v->data(v), arr, elem_num*elem_size);
 	return v;
 }
 
