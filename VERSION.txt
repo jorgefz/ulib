@@ -1,0 +1,25 @@
+
+
+
+ULib - Utilities Library for the C Programming Language
+
+=== VERSION HISTORY ===
+
+Version 0.5 - 26/07/2021
+	- Removed dependence on standard libraries.
+	- Added #defining custom implementations of standard library
+	 functions (e.g. malloc, strlen, etc).
+	- Tests compile to bin folder.
+
+Version 0.4
+	- Added arglib.h
+
+Version 0.3
+	- Added array.h
+
+Version 0.2
+	- Added string.h
+
+Version 0.1
+	- Project & Folder Setup
+	- Added vector.h

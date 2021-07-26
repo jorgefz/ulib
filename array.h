@@ -54,6 +54,7 @@ Planned
 #ifndef ARRAY_H
 #define ARRAY_H
 
+#define DEFS_IMPLEMENTATION
 #include "defs.h"
 
 

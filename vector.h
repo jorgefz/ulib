@@ -76,6 +76,7 @@
 #ifndef VECTOR_H
 #define VECTOR_H 1
 
+#define DEFS_IMPLEMENTATION
 #include "defs.h"
 
 

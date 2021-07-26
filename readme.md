@@ -1,12 +1,12 @@
 
-# C-Utils
+# ULib
 
 *Useful functions and data structures for the C Programming Language*
 
 This repository contains a small number of single-header libraries that add useful data structures. The code is fully written in ANSI C (C89).
 
 * string.h: string container and manipulator.
-* array.h: numeric array of static size.
+* array.h: numeric array of fixed size.
 * vector.h: generic resizeable container.
 * dict.h: dictionary data structure (WIP).
 * list.h: doubly-linked list generic container (WIP).
@@ -98,33 +98,33 @@ array* array_new(ulong size, uint type);
 ```
 ### Array methods:
 ```c
-void (*free)(struct array__struct*);
-void (*print)(struct array__struct*);
+free (array* arr);
+print (array* arr);
 
-void (*fill)(struct array__struct*, ...);
-void (*range)(struct array__struct*, ...);
-void (*linspace)(struct array__struct*, ...);
-void (*from_c_array)(struct array__struct*, const void* c_arr);
+fill (array* arr, ...);
+range (array* arr, ...);
+linspace (array* arr, ...);
+from_c_array (array* arr, const void* c_arr);
 
-void (*reverse)(struct array__struct*);
+reverse (array* arr);
 
-void (*seti)(struct array__struct*, ulong ind, int value);
-void (*setf)(struct array__struct*, ulong ind, double value);
+seti (array* arr, ulong ind, int value);
+setf (array* arr, ulong ind, double value);
 
-int (*geti)(struct array__struct*, ulong ind);
-double (*getf)(struct array__struct*, ulong ind);
-char* (*at)(struct array__struct*, ulong ind);
+geti (array* arr, ulong ind);
+getf (array* arr, ulong ind);
+at (array* arr, ulong ind);
 
 	/* Statistics */
-int (*maxi)(struct array__struct*);
-double (*maxf)(struct array__struct*);
-int (*mini)(struct array__struct*);
-double (*minf)(struct array__struct*);
-uint (*imax)(struct array__struct*);
-uint (*imin)(struct array__struct*);
-int (*sumi)(struct array__struct*);
-double (*sumf)(struct array__struct*);
-double (*mean)(struct array__struct*);
+maxi (array* arr);
+maxf (array* arr);
+mini (array* arr);
+minf (array* arr);
+imax (array* arr);
+imin (array* arr);
+sumi (array* arr);
+sumf (array* arr);
+mean (array* arr);
 	
 ```
 
@@ -136,7 +136,7 @@ Resizeable generic container.
 ### New vector
 Initialises a new vector with members of data type size 'bytes'.
 ```c
-vector *vnew( bytes );
+vector *vector_new( bytes );
 ```
 Example:
 `vector *v = vnew( sizeof(int) )`{:.c} creates a vector of integers.
@@ -145,45 +145,45 @@ Example:
 ### Vector deletion
 Frees the allocated memory of a vector 'v'.
 ```c
-void vfree(vector *v);
+void v->free(vector *v);
 ```
 
 ## Getters
 ### Vector size
 Retrieves the number of members in an input vector 'v'.
 ```c
-size_t vsize(vector *v);
+size_t v->length(vector *v);
 ```
 
 ### Vector data type size
 Retrieves the size in bytes of the data type of individual members of a vector 'v'.
 ```c
-size_t vdtype(vector *v);
+size_t v->dtype(vector *v);
 ```
 
 ### Vector data
 Retrieves pointer to data array of the vector.
 ```c
-size_t vdata(vector *v);
+size_t v->data(vector *v);
 ```
 
 ### Get member
 Retrieves a pointer to the vector member at input index 'i'. 
 ```c
-void *vat(vector *v, size_t i);
+void *v->at(vector *v, size_t i);
 ```
 
 ## Setters
 ### Set
 Overwrites an existing vector member with input data.
 ```c
-vector *vset(vector *v, size_t i, void *ptr);
+vector *v->set(vector *v, size_t i, void *ptr);
 ```
 
 ### Fill
 Fills the whole vector with an input member 'ptr'. Existing member data is overwritten.
 ```c
-vector *vfill(vector *v, void *ptr);
+vector *v->fill(vector *v, void *ptr);
 ```
 
 
@@ -192,19 +192,19 @@ Inserts a new vector member 'ptr' at index 'i'.
 It returns a pointer to the input vector 'v',
 and NULL on fail.
 ```c
-vector *vinsert(vector *v, size_t j, void *new);
+vector *v->insert(vector *v, size_t j, void *new);
 ```
 
 ### Remove member
 Removes a member from a vector 'v' at index 'i'.
 ```c
-vector *vdelete(vector *v, size_t i);
+vector *v->delete(vector *v, size_t i);
 ```
 
 ### Resize
 Changes the size of a vector 'v' to an input value 's'. If the size is increased, new empty members are added. On the other hand, if the size is reduced, members at the end of the vector are lost. 
 ```c
-vector *vresize(vector *v, size_t s);
+vector *v->resize(vector *v, size_t s);
 ```
 
 
@@ -212,7 +212,39 @@ vector *vresize(vector *v, size_t s);
 Converts the input array 'arr', with 'n' memebrs of size 'b' bytes each,
 into a vector. It returns a pointer to the newly created vector.
 ```c
-vector *vtovector(void *arr, size_t n, size_t b);
+vector *v->from_array(void *arr, size_t n, size_t b);
+```
+
+# ArgLib
+
+Management of input command line arguments
+
+## Initialization
+
+```c
+arglib_init();
+```
+
+## Defining argument options
+```c
+arglib_add_option(char c_label, char* s_label, char* descr, 
+	int dtype, int req);
+```
+
+## Parsing
+```c
+arglib_parse(int argc, char* argv[]);
+```
+
+## Retrieving parameters
+```c
+void *param = arglib_get_value(char* label)
+```
+If the queried parameter wasn't used in the command line arguments, this function will return NULL.
+
+## Freeing
+```c
+arglib_free();
 ```
 
 
@@ -487,7 +519,7 @@ the single argument. The function must return an int type.
 The return values of the function are saved in the memory
 of the input array, and a pointer to it is returned.
 ```c
-int *intfunc(int (*func)(), int *arr, size_t len)
+int *intfunc(int (*func (), int *arr, size_t len)
 ```
 
 ### Compare two arrays
@@ -745,7 +777,7 @@ double *fltmult(double *dest, const double *arr, size_t len)
 ### Apply function to array members
 Applies an input function 'func' to the elements of an array 'arr' of length 'len'. The results are saved over the values of 'arr', and a pointer to it is returned. The input function must have a single argument, of type double, and return have double return type too.
 ```c
-double *fltfunc(double (*func)(), double *arr, size_t len)
+double *fltfunc(double (*func (), double *arr, size_t len)
 ```
 
 ### Compare two arrays

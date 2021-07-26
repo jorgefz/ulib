@@ -42,6 +42,7 @@ v0.2 - 22/0.3/2021
 #ifndef STRING_H
 #define STRING_H
 
+#define DEFS_IMPLEMENTATION
 #include "defs.h"
 
 /*

@@ -2,13 +2,16 @@ CC=gcc
 
 CFLAGS = -Wall -Wextra -std=c89
 
-all: test_string test_array test_vector
+all: string array vector
 
-test_string: test/test_string.c
-	$(CC) -o bin/test_string test/test_string.c $(CFLAGS)
+string: test/string.c
+	$(CC) -o bin/string test/string.c $(CFLAGS)
 
-test_array: test/test_array.c
-	$(CC) -o bin/test_array test/test_array.c $(CFLAGS)
+array: test/array.c
+	$(CC) -o bin/array test/array.c $(CFLAGS)
 
-test_vector: test/test_vector.c
-	$(CC) -o bin/test_vector test/test_vector.c $(CFLAGS)
+vector: test/vector.c
+	$(CC) -o bin/vector test/vector.c $(CFLAGS)
+
+arglib: test/arglib.c
+	$(CC) -o bin/arglib test/arglib.c $(CFLAGS)
