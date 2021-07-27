@@ -1,6 +1,9 @@
 #ifndef DICT_H
 #define DICT_H
 
+#define DEFS_IMPLEMENTATION
+#include "defs.h"
+
 struct dict__struct {
 	unsigned char** keys;
 	unsigned char** values;
@@ -19,13 +22,20 @@ typedef struct dict__struct dict;
 dict* dict_new();
 void dict_free(dict* d);
 
-dict* dict__add(dict* d, const char* key, )
-int dict__has_key(dict* d);
+dict* dict__add(dict* d, const char* key, void* data);
+dict* dict__remove(dict* d, const char* key, void* data);
+dict* dict__set(dict* d, const char* key, void* data);
+int dict__has_key(dict* d, const char* key);
 
 #endif /* DICT_H */
-
-
 
 #ifdef DICT_IMPLEMENTATION
 
 #endif /* DICT_IMPLEMENTATION */
+
+
+
+
+
+
+

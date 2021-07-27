@@ -2,7 +2,7 @@ CC=gcc
 
 CFLAGS = -Wall -Wextra -std=c89
 
-all: string array vector
+all: string array vector arglib list pngread
 
 string: test/string.c
 	$(CC) -o bin/string test/string.c $(CFLAGS)
@@ -15,3 +15,9 @@ vector: test/vector.c
 
 arglib: test/arglib.c
 	$(CC) -o bin/arglib test/arglib.c $(CFLAGS)
+
+list: test/list.c
+	$(CC) -o bin/list test/list.c $(CFLAGS)
+
+pngread: pngread.c
+	$(CC) -o bin/pngread pngread.c -Wall -Wextra

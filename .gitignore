@@ -1,5 +1,1 @@
-test_string
-test_array
-
-test_string.exe
-test_array.exe
+bin/*

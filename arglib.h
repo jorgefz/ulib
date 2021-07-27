@@ -14,8 +14,10 @@ Description
 #include <stdlib.h>
 #include <string.h>
 
+#ifndef DEFS_IMPLEMENTATION
 #define DEFS_IMPLEMENTATION
 #include "defs.h"
+#endif
 
 /* MAX string length of multi-char label */
 #define ARG_MAX_SLABEL_LEN 12

@@ -42,8 +42,10 @@ v0.2 - 22/0.3/2021
 #ifndef STRING_H
 #define STRING_H
 
+#ifndef DEFS_IMPLEMENTATION
 #define DEFS_IMPLEMENTATION
 #include "defs.h"
+#endif
 
 /*
  *	DATA STRUCTURES & MACROS

@@ -76,8 +76,10 @@
 #ifndef VECTOR_H
 #define VECTOR_H 1
 
+#ifndef DEFS_IMPLEMENTATION
 #define DEFS_IMPLEMENTATION
 #include "defs.h"
+#endif
 
 
 struct vector__struct {

@@ -5,6 +5,12 @@ ULib - Utilities Library for the C Programming Language
 
 === VERSION HISTORY ===
 
+Version 0.6 - 27/07/2021
+	- Added list.h, (WIP)
+	- Added types.h
+	- Added ulib.h which includes all headers
+	- Solved redefinition onflict if including several ULib headers
+
 Version 0.5 - 26/07/2021
 	- Removed dependence on standard libraries.
 	- Added #defining custom implementations of standard library
