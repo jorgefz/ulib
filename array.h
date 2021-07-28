@@ -64,6 +64,7 @@ Planned
  *	DATA STRUCTURES & MACROS
  */
 
+typedef struct array__struct array;
 struct array__struct {
 	char* data;
 	unsigned long size;
@@ -71,36 +72,33 @@ struct array__struct {
 	unsigned long bytes; /* size in bytes of each member */
 
 	/* Function pointers */
-	void (*free)(struct array__struct*);
-	void (*print)(struct array__struct*);
+	void (*free)(array*);
+	void (*print)(array*);
 
-	void (*fill)(struct array__struct*, ...);
-	void (*range)(struct array__struct*, ...);
-	void (*linspace)(struct array__struct*, ...);
-	void (*from_c_array)(struct array__struct*, const void* c_arr);
+	void (*fill)(array*, ...);
+	void (*range)(array*, ...);
+	void (*linspace)(array*, ...);
+	void (*from_c_array)(array*, const void* c_arr);
+	void (*reverse)(array*);
 
-	void (*seti)(struct array__struct*, unsigned long ind, int value);
-	void (*setf)(struct array__struct*, unsigned long ind, double value);
+	void (*seti)(array*, unsigned long ind, int value);
+	void (*setf)(array*, unsigned long ind, double value);
 
-	int (*geti)(struct array__struct*, unsigned long ind);
-	double (*getf)(struct array__struct*, unsigned long ind);
-	char* (*at)(struct array__struct*, unsigned long ind);
+	int (*geti)(array*, unsigned long ind);
+	double (*getf)(array*, unsigned long ind);
+	char* (*at)(array*, unsigned long ind);
 
 	/* stats */
-	int (*maxi)(struct array__struct*);
-	double (*maxf)(struct array__struct*);
-	int (*mini)(struct array__struct*);
-	double (*minf)(struct array__struct*);
-	unsigned int (*imax)(struct array__struct*);
-	unsigned int (*imin)(struct array__struct*);
-	int (*sumi)(struct array__struct*);
-	double (*sumf)(struct array__struct*);
-	double (*mean)(struct array__struct*);
-
-	void (*reverse)(struct array__struct*);
-
+	int (*maxi)(array*);
+	double (*maxf)(array*);
+	int (*mini)(array*);
+	double (*minf)(array*);
+	unsigned int (*imax)(array*);
+	unsigned int (*imin)(array*);
+	int (*sumi)(array*);
+	double (*sumf)(array*);
+	double (*mean)(array*);	
 };
-typedef struct array__struct array;
 
 enum array__types {
 	ARRAY_INT, ARRAY_DOUBLE
@@ -234,8 +232,8 @@ unsigned long array__type_bytes(unsigned int type){
 }
 
 void array__free(array* arr){
-	free(arr->data);
-	free(arr);
+	ULIB_FREE(arr->data);
+	ULIB_FREE(arr);
 }
 
 void array__debug(array* arr){

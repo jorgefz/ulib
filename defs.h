@@ -15,10 +15,11 @@
 #endif
 
 /* stdlib.h functions */
-#if !defined(ULIB_MALLOC) || !defined(ULIB_REALLOC)
+#if !defined(ULIB_MALLOC) || !defined(ULIB_REALLOC) || !defined(ULIB_FREE)
 	#include <stdlib.h>
 	#define ULIB_MALLOC malloc
 	#define ULIB_REALLOC realloc
+	#define ULIB_FREE free
 #endif
 
 #if !defined(ULIB_STRTOL) || !defined(ULIB_STRTOD)

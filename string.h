@@ -51,25 +51,26 @@ v0.2 - 22/0.3/2021
  *	DATA STRUCTURES & MACROS
  */
 
+typedef struct string__struct string;
 struct string__struct {
 	char* str;
 	unsigned long length;
 
 	/* Function pointers */
-	void (*free)(struct string__struct*);
-	void (*print)(struct string__struct*);
-	struct string__struct* (*copy)(struct string__struct*);
-	char* (*at)(struct string__struct*, int j);
-	char (*getc)(struct string__struct*, int j);
-	struct string__struct* (*insert)(struct string__struct*, const char* substr, int j);
-	struct string__struct* (*append)(struct string__struct*, const char* substr);
+	void (*free)(string*);
+	void (*print)(string*);
+	string* (*copy)(string*);
+	char* (*at)(string*, int j);
+	char (*getc)(string*, int j);
+	string* (*insert)(string*, const char* substr, int j);
+	string* (*append)(string*, const char* substr);
 	
-	struct string__struct* (*erase)(struct string__struct* s, int j, unsigned int n);
-	struct string__struct* (*clear)(struct string__struct* s);
-	struct string__struct* (*slice)(struct string__struct* s, int j, int k);
-	struct string__struct* (*substr)(struct string__struct* s, int j, int k);
+	string* (*erase)(string* s, int j, unsigned int n);
+	string* (*clear)(string* s);
+	string* (*slice)(string* s, int j, int k);
+	string* (*substr)(string* s, int j, int k);
 };
-typedef struct string__struct string;
+
 
 /*
  *	FUNCTION DECLARATIONS
@@ -185,16 +186,14 @@ char string__getc(string* s, int j){
 }
 
 void string__print(string* s){
-	printf("\"%s\"\n", s->str);
+	ULIB_PRINTF("\"%s\"\n", s->str);
 }
 
 void string__free(string* s){
-
-	if(!s) printf("s is null\n");
-	if(!s->str) printf("str is null\n");
-
-	free(s->str);
-	free(s);
+	if(!s) ULIB_PRINTF("s is null\n");
+	if(!s->str) ULIB_PRINTF("str is null\n");
+	ULIB_FREE(s->str);
+	ULIB_FREE(s);
 }
 
 string* string__copy(string* s){

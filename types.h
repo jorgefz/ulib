@@ -96,7 +96,7 @@ void types__print(unsigned int type, void* var){
 			ULIB_PRINTF("%c", *(char*)var);
 			break;
 		case TYPE_UCHAR:
-			ULIB_PRINTF("%u", *(unsigned int*)var);
+			ULIB_PRINTF("%u", (unsigned int)*(unsigned char*)var);
 			break;
 		case TYPE_STR_10:
 		case TYPE_STR_20:

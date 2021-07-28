@@ -81,28 +81,25 @@
 #include "defs.h"
 #endif
 
-
+typedef struct vector__struct vector;
 struct vector__struct {
-	struct string__struct* (*substr)(struct string__struct* s, int j, int k);
-
 	void *d;
 	unsigned int len;
 	unsigned int dtype;
 	/* Methods */
-	unsigned int (*length)(struct vector__struct*);
-	unsigned int (*elem_size)(struct vector__struct*);
-	void* (*data)(struct vector__struct*);
-	void* (*at)(struct vector__struct*, unsigned int);
-	unsigned int (*mem)(struct vector__struct*);
-	struct vector__struct* (*set)(struct vector__struct*, unsigned int, void*);
-	struct vector__struct* (*fill)(struct vector__struct*, void*);
-	struct vector__struct* (*insert)(struct vector__struct*, unsigned int, void*);
-	struct vector__struct* (*delete)(struct vector__struct*, unsigned int);
-	struct vector__struct* (*resize)(struct vector__struct*, unsigned int);
-	struct vector__struct* (*from_array)(void*, unsigned int, unsigned int);
-	void (*free)(struct vector__struct*);
+	unsigned int (*length)(vector*);
+	unsigned int (*elem_size)(vector*);
+	void* (*data)(vector*);
+	void* (*at)(vector*, unsigned int);
+	unsigned int (*mem)(vector*);
+	vector* (*set)(vector*, unsigned int, void*);
+	vector* (*fill)(vector*, void*);
+	vector* (*insert)(vector*, unsigned int, void*);
+	vector* (*delete)(vector*, unsigned int);
+	vector* (*resize)(vector*, unsigned int);
+	vector* (*from_array)(void*, unsigned int, unsigned int);
+	void (*free)(vector*);
 };
-typedef struct vector__struct vector;
 
 /* Function Declarations */
 vector *vector_new(unsigned int bytes);
@@ -217,7 +214,7 @@ vector *vector__delete(vector *v, unsigned int i){
 
 	/*If there is only one member to delete, free instead*/
 	if(v->len == 1){
-		free(v->d);
+		ULIB_FREE(v->d);
 		v->len--;
 		return v;
 	}
@@ -249,8 +246,8 @@ vector *vector__resize(vector *v, unsigned int newsize){
 
 void vector__free(vector *v){
 	if(!v || !v->d) return
-	free(v->d);
-	free(v);
+	ULIB_FREE(v->d);
+	ULIB_FREE(v);
 }
 
 vector *vector__from_array(void *arr, unsigned int elem_num, unsigned int elem_size){
