@@ -8,10 +8,18 @@
 #define DEFS_H 1
 
 /* stdio.h functions */
-#if !defined(ULIB_PRINTF) || !defined(ULIB_FPRINTF)
+#if !defined(ULIB_PRINTF) || !defined(ULIB_FPRINTF) || !defined(ULIB_SPRINTF) \
+	|| !defined(ULIB_VPRINTF) || !defined(ULIB_VFPRINTF) || !defined(ULIB_VSPRINTF) \
+	|| !defined(ULIB_FOPEN) || !defined(ULIB_FCLOSE)
 	#include <stdio.h>
 	#define ULIB_PRINTF printf
 	#define ULIB_FPRINTF fprintf
+	#define ULIB_SPRINTF sprintf
+	#define ULIB_VPRINTF vprintf
+	#define ULIB_VFPRINTF vfprintf
+	#define ULIB_VSPRINTF vsprintf
+	#define ULIB_FOPEN fopen
+	#define ULIB_FCLOSE fclose
 #endif
 
 /* stdlib.h functions */

@@ -29,6 +29,11 @@ v0.1 - 20/03/2021
 v0.2 - 22/0.3/2021
 	- Editing: append, clear, slice, substr
 
+TO-DO
+	- Let string_new accept formatted strings like sprintf.
+		E.g. string* string_new(char*, ...) ->
+			string_new(NULL), string_new("Hello"), string_new("%d+%d=%d", a, b, c)
+
 */
 
 
@@ -54,9 +59,10 @@ v0.2 - 22/0.3/2021
 typedef struct string__struct string;
 struct string__struct {
 	char* str;
-	unsigned long length;
+	unsigned long len;
 
 	/* Function pointers */
+	unsigned int (*length)(string*);
 	void (*free)(string*);
 	void (*print)(string*);
 	string* (*copy)(string*);
@@ -76,9 +82,10 @@ struct string__struct {
  *	FUNCTION DECLARATIONS
  */
 string* string_init(string* s, const char* s_orig);
-string* string_new(const char* s_orig);
+string* string_new(const char* s_orig, ...);
 void string__free(string* s);
 
+unsigned int string__length(string* s);
 char* string__at(string* s, int j);
 char string__getc(string* s, int j);
 
@@ -145,13 +152,14 @@ string* string__split(string* s, const char* tokens)
 
 string* string_init(string* s, const char* s_orig){
 
-	s->length = s_orig ? ULIB_STRLEN(s_orig) : 0;
-	s->str = calloc(s->length+1, sizeof(char));
+	s->len = s_orig ? ULIB_STRLEN(s_orig) : 0;
+	s->str = calloc(s->len+1, sizeof(char));
 	if(!s->str) return NULL;
 	if(s_orig) ULIB_STRCPY(s->str, s_orig);
 
 	/* Function pointers */
 	s->free = &string__free;
+	s->length = string__length;
 	s->at = &string__at;
 	s->getc = &string__getc;
 	s->print = &string__print;
@@ -168,31 +176,90 @@ string* string_init(string* s, const char* s_orig){
 	return s;
 }
 
-string* string_new(const char* s_orig){
-	string* s;
-	s = malloc(sizeof(string));
+/* NEW */
+FILE* fopen_null(){
+	#ifdef _WIN32
+		const char* snull = "nul";
+	#else
+		const char* snull = "/dev/null";
+	#endif
+	return ULIB_FOPEN(snull, "w");
+}
+
+/* NEW */
+/* Returns the final length of a formatted string */
+int vfstrlen(const char* fmt, ULIB_VA_LIST vargs){
+	FILE* fnull = fopen_null();
+	if(!fnull) return -1;
+	int len = ULIB_VFPRINTF(fnull, fmt, vargs); /* returns negative number on fail */
+	ULIB_FCLOSE(fnull);
+	return len;
+}
+
+string* string_new(const char* fmt, ...){
+	/* allocate string */
+	string* s = ULIB_MALLOC(sizeof(string));
 	if(!s) return NULL;
-	return ( string_init(s, s_orig) );
+	if(!fmt) return string_init(s, NULL); /* create empty string */
+
+	/*
+	 * Fake snprintf for C89 (not in standard lib till C99).
+	 * fprintf to NUL to get final length,
+	 * allocate as much, and create formatted string.
+	 * This avoids buffer overflow on sprintf.
+	 */
+	ULIB_VA_LIST vargs;
+	ULIB_VA_START(vargs, fmt);
+	int slength = vfstrlen(fmt, vargs); /* returns negative number on fail */
+	
+	#ifdef ULIB_DEBUG
+	ULIB_PRINTF("DEBUG: new string vfstrlen -> %d\n", slength);
+	#endif
+
+	if(slength < 0){
+		ULIB_FREE(s);
+		return NULL;
+	}
+	char* fullstr = ULIB_MALLOC(slength+1);
+	if(!fullstr){
+		ULIB_FREE(s);
+		return NULL;
+	}
+	int retsize = ULIB_VSPRINTF(fullstr, fmt, vargs); /* returns negative number on fail */
+	if (retsize < 0 || retsize != slength){
+		ULIB_FREE(s);
+		ULIB_FREE(fullstr);
+		return NULL;
+	}
+	ULIB_VA_END(vargs);
+	s = string_init(s, fullstr);
+	ULIB_FREE(fullstr);
+	return s;
+}
+
+unsigned int string__length(string* s){
+	return ULIB_STRLEN(s->str);
 }
 
 char* string__at(string* s, int j){
-	if(abs(j) > (int)s->length) j = (int)s->length * j/abs(j);
-	if(j < 0) j = (int)s->length + j;
+	if(abs(j) > (int)s->len) j = (int)s->len * j/abs(j);
+	if(j < 0) j = (int)s->len + j;
 	return (s->str + j);
 }
 
 char string__getc(string* s, int j){
-	return *(s->at(s, j));
+	char *c = s->at(s, j);
+	if(!c) return (char)0;
+	return *c;
 }
 
 void string__print(string* s){
-	ULIB_PRINTF("\"%s\"\n", s->str);
+	ULIB_PRINTF("\"%s\"", s->str);
 }
 
 void string__free(string* s){
-	if(!s) ULIB_PRINTF("s is null\n");
-	if(!s->str) ULIB_PRINTF("str is null\n");
-	ULIB_FREE(s->str);
+	if(!s) return;
+	if(s->str) ULIB_FREE(s->str);
 	ULIB_FREE(s);
 }
 
@@ -201,63 +268,63 @@ string* string__copy(string* s){
 	new = malloc(sizeof(string));
 	if(!new) return NULL;
 	ULIB_MEMCPY(new, s, sizeof(string));
-	new->str = malloc(s->length+1);
+	new->str = malloc(s->len+1);
 	if(!new->str) return NULL;
-	ULIB_MEMCPY(new->str, s->str, s->length+1);
+	ULIB_MEMCPY(new->str, s->str, s->len+1);
 	return new;
 }
 
 string* string__insert(string* s, const char* substr, int j){
 
-	if(j < 0) j = (int)s->length + j + 1;
-	if(j > (int)s->length || j < 0) return NULL;
+	if(j < 0) j = (int)s->len + j + 1;
+	if(j > (int)s->len || j < 0) return NULL;
 
 	unsigned int sslength = ULIB_STRLEN(substr);
 	char* insptr = s->str + j;
 
-	char* newstr = realloc(s->str, (s->length + sslength + 1)*sizeof(char) );
+	char* newstr = realloc(s->str, (s->len + sslength + 1)*sizeof(char) );
 	if(!newstr) return NULL;
 
 	s->str = newstr;
-	s->length += sslength;
+	s->len += sslength;
 
-	ULIB_MEMCPY(insptr + sslength, insptr, s->length - sslength - j);
+	ULIB_MEMCPY(insptr + sslength, insptr, s->len - sslength - j);
 	ULIB_MEMCPY(insptr, substr, sslength);
-	*(s->str + s->length) = (char)0;
+	*(s->str + s->len) = (char)0;
 
 	return s;
 }
 
 string* string__append(string* s, const char* substr){
-	return ( s->insert(s, substr, s->length) );
+	return ( s->insert(s, substr, s->len) );
 }
 
 string* string__erase(string* s, int j, unsigned int n){
-	if(j < 0) j = (int)s->length + j + 1;
-	if(j > (int)s->length || j < 0) return NULL;
-	if(j+(int)n > (int)s->length) n = s->length - j;
+	if(j < 0) j = (int)s->len + j + 1;
+	if(j > (int)s->len || j < 0) return NULL;
+	if(j+(int)n > (int)s->len) n = s->len - j;
 
-	ULIB_MEMCPY(s->str+j, s->str+j+n, s->length-j-n);
+	ULIB_MEMCPY(s->str+j, s->str+j+n, s->len-j-n);
 
 	char *newstr = NULL;
-	newstr = realloc(s->str, s->length - n + 1 );
+	newstr = realloc(s->str, s->len - n + 1 );
 	if(!newstr) return NULL;
 
 	s->str = newstr;
-	s->length -= n;
-	*(s->str + s->length) = (char)0;
+	s->len -= n;
+	*(s->str + s->len) = (char)0;
 	return s;
 }
 
 string* string__clear(string* s){
-	return s->erase(s, 0, s->length+1);
+	return s->erase(s, 0, s->len+1);
 }
 
 string* string__slice(string* s, int j, int k){
 	unsigned int n;
-	j < 0 ? n = s->length+(unsigned int)j : (n = (unsigned int)j);
+	j < 0 ? n = s->len+(unsigned int)j : (n = (unsigned int)j);
 	if( s->erase(s, 0, n) == NULL ) return NULL;
-	if( s->erase(s, k-j, s->length) == NULL) return NULL;
+	if( s->erase(s, k-j, s->len) == NULL) return NULL;
 	return s;
 }
 

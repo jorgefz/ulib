@@ -5,6 +5,12 @@ ULib - Utilities Library for the C Programming Language
 
 === VERSION HISTORY ===
 
+Version 0.7 - 30/07/2021
+	- string.h: length is not obtained from function string->length(string).
+	- string.h: string_new accepts formatted string (like printf, etc).
+	- string.h: improved string.c tests
+	- ulib: added debug constant "ULIB_DEBUG". If define, library calls print extra info.
+
 Version 0.6 - 27/07/2021
 	- Added list.h
 	- Added types.h
