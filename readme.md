@@ -3,90 +3,160 @@
 
 *Useful functions and data structures for the C Programming Language*
 
-This repository contains a small number of single-header libraries that add useful data structures. The code is fully written in ANSI C (C89).
+This repository contains a small number of single-header libraries that add useful data structures. The code is fully written in C89, with support to override standard library functions.
 
 * string.h: string container and manipulator.
 * array.h: numeric array of fixed size.
 * vector.h: generic resizeable container.
-* dict.h: dictionary data structure (WIP).
-* list.h: doubly-linked list generic container (WIP).
+* list.h: doubly-linked list generic container.
 * arglib.h: command line argument manager.
+* dict.h: dictionary data structure (WIP).
 * io.h: file input and output (WIP).
+
+## Installation
+
+Just drop this folder on your project or add it to your include PATH. You can include all headers with:
+```c
+#include "ulib/ulib.h"
+```
+Alternatively, you can include individual headers with:
+```c
+#define HEADER_IMPLEMENTATION
+#include "ulib/header.h"
+```
+and substitute with the desired header name. E.g., for `string.h`:
+```c
+#define STRING_IMPLEMENTATION
+#include "ulib/string.h"
+```
+Make sure to `#define` the implementation only once. If you absolutely must share it amongst several source files, wrap the definition in a guard.
 
 ## String.h
 
-Extends functionality of c strings in a similar manner as C++ std::string.
+Extends functionality of C strings.
 
 ### Initialising
 
 A string may be initialized from a null-terminated `char*` array with `string_new` , which returns a pointer to a `string` structure.
 ```c
-string* my_string = string_new("Hello, World!");
-```
-The string's length can be retrieved with `my_string->length`, and the underlying char array with `my_string->str`. The predefined string methods can be called with function pointers.
-```c
-string* s->copy(string* s);
+string* s = string_new("Hello, World!");
+string* s = string_new("Name:%s Age:%u \n", name, age); /* Formatted string */
+string* s = string_new(NULL); /* Emtpy string */
 ```
 
-### Freeing (destructor)
-To free the string after it is no longer needed, use the following function:
-```c
-void  s->free(string* s);
-```
-After using this function, the string pointer `my_string` can no longer be used.
+### Methods
 
-### Printing
+The string methods can be called using function pointers.
+
+#### str
+```c
+char* s->str
+```
+Returns a pointer to the underlying char array.
+
+#### length
+```c
+unsigned int s->length(string* s)
+```
+Returns the number of characters in the string.
+
+#### free
+```c
+void s->free(string* s)
+```
+Frees the string object.
+
+#### copy
+```c
+string* s->copy(string* s)
+```
+Initialises a new string by copying an existing one. Returns NULL on fail.
+
+#### print
 ```c
 void  s->print(string* s);
 ```
+Equivalent to:
 ```c
 printf("%s\n", s->str);
 ```
 
-### Getters
-
-This returns a pointer to a specified location in the string, with bounds checking. The input index 'j' can be positive (to indicate an offset from the beginning), or negative (an offset from the end).
+#### at
 ```c
 char* s->at(string* s, int j);
 ```
-For example, `my_string->at(my_string, -1)` returns a char pointer to the last character in the string (before the terminator).
+Returns a pointer to a specified location in the string, with bounds checking. The input index `j` can be positive (to indicate an offset from the beginning), or negative (an offset from the end). Returns NULL on fail.
+For example, `s->at(s, -1)` returns a pointer to the last character in the string (before the terminator).
 
-
-Thus fucntion returns a single character at the specified location in the string, which bounds checking. The input index can be both positive or negative.
+#### getc
 ```c
-char  s->getc(string* s, int j);
+char s->getc(string* s, int j);
+```
+Returns a single character at the specified location in the string, which bounds checking. The input index `j` can be both positive or negative. Returns `\0` on fail.
+
+#### insert
+```c
+string* s->insert(string* s, const char* cstr, int j);
+```
+Inserts an input c-string at the location specified by index `j`, which may be positive or negative. Returns NULL on fail.
+
+#### append
+```c
+string* s->append(string* s, const char* cstr);
+```
+Inserts an input c-string at the end of the string. Equivalent to:
+```c
+s->insert(s, cstr, -1);
 ```
 
-### String Manipulation
-This extends the string, inserting an input char array at the location of index 'j', which may be positive or negative.
-```c
-string* s->insert(string* s, const char* substr, int j);
-```
-
-'Append' inserts an input char array at the end of the string.
-```c
-string* s->append(string* s, const char* substr);
-```
-
-'Erase' removes 'n' characters from the string from the location at index 'j', shrinking the string to save memory.
+#### erase
 ```c
 string* s->erase(string* s, int j, unsigned int n);
 ```
+Removes `n` characters from the string from the location at index `j`, and appends the two ends, shrinking the string.
 
-'Clear' removes all characters in the string.
+#### clear
 ```c
 string* s->clear(string* s);
 ```
+Removes all characters in the string, reducing its size to zero.
 
-'Slice' removes all characters from the string, except those between indices 'j' and 'k'.
+#### slice
 ```c
 string* s->slice(string* s, int j, int k);
 ```
+Removes all characters from the string, preserving those between indices `j` and `k`.
 
-'Substr' returns a substring (between indices 'j' and 'k'), leaving the original string untouched. Note that the substring must also be freed to avoid memory leaks.
+#### substr
 ```c
 string* s->substr(string* s, int j, int k);
 ```
+Returns a copy of the string sliced between the indices `j` and `k`, leaving the original string untouched. Note that the substring must also be freed in order to avoid memory leaks.
+
+
+### Example code
+```c
+#define STRING_IMPLEMENTATION
+#include "string.h"
+
+int main() {
+	const char* name = "Baz";
+	unsigned int age = 42;
+	
+	string* s = string_new("Name: %s, Age: %u", name, age);
+	s->append(s, "\n");
+	s->print(s);
+
+	string* r = s->substr(s, 9, -1);
+	r->print(r);
+	r->free(r);
+
+	s->free(s);
+	return 0;
+}
+```
+
+
 
 ## Array.h
 
@@ -96,7 +166,7 @@ This section is a Work in Progress.
 ```c
 array* array_new(ulong size, uint type);
 ```
-### Array methods:
+### Methods
 ```c
 free (array* arr);
 print (array* arr);
