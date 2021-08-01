@@ -54,9 +54,9 @@ Planned
 #ifndef ARRAY_H
 #define ARRAY_H
 
-#ifndef DEFS_IMPLEMENTATION
-#define DEFS_IMPLEMENTATION
-#include "defs.h"
+#ifndef TYPE_IMPLEMENTATION
+#define TYPE_IMPLEMENTATION
+#include "types.h"
 #endif
 
 
@@ -100,10 +100,6 @@ struct array__struct {
 	double (*mean)(array*);	
 };
 
-enum array__types {
-	ARRAY_INT, ARRAY_DOUBLE
-}; /* Supported types */
-
 
 /*
  *	FUNCTION DECLARATIONS
@@ -125,9 +121,6 @@ void    array__setval_db(array* arr, unsigned long ind, double value);
 void array__print_int(array* arr);
 void array__print_double(array* arr);
 void array__print(array* arr);
-/*
--->mixed white & asian, other background
-*/
 
 void array__fill_int(array* arr, int value);
 void array__fill_db(array* arr, double value);
@@ -182,6 +175,11 @@ array* array_new(unsigned long size, unsigned int type){
 	unsigned long bytes;
 	array* arr;
 
+	/* Supported types */
+	if (type != TYPE_INT && type != TYPE_DOUBLE){
+		return NULL;
+	}
+
 	bytes = array__type_bytes(type);
 	arr = ULIB_MALLOC(sizeof(array));
 	if(!arr) return NULL;
@@ -224,9 +222,9 @@ array* array_new(unsigned long size, unsigned int type){
 
 unsigned long array__type_bytes(unsigned int type){
 	switch(type){
-		case ARRAY_INT: default:
+		case TYPE_INT: default:
 			return sizeof(int);
-		case ARRAY_DOUBLE:
+		case TYPE_DOUBLE:
 			return sizeof(double);
 	}
 }
@@ -291,10 +289,10 @@ void array__print_double(array* arr){
 
 void array__print(array* arr){
 	switch(arr->type){
-		case ARRAY_INT:
+		case TYPE_INT:
 			array__print_int(arr);
 			break;
-		case ARRAY_DOUBLE:
+		case TYPE_DOUBLE:
 			array__print_double(arr);
 			break;
 	}
@@ -325,10 +323,10 @@ void array__fill(array* arr, ...){
 	ULIB_VA_START(args,arr);
 	
 	switch(arr->type){
-		case ARRAY_INT:
+		case TYPE_INT:
 			array__fill_int(arr, ULIB_VA_ARG(args,int));
 			break;
-		case ARRAY_DOUBLE:
+		case TYPE_DOUBLE:
 			array__fill_db(arr, ULIB_VA_ARG(args,double));
 			break;
 	}
@@ -363,10 +361,10 @@ void array__fill_range(array* arr, ...){
 	ULIB_VA_LIST args;
 	ULIB_VA_START(args,arr);
 	switch(arr->type){
-		case ARRAY_INT:
+		case TYPE_INT:
 			array__fill_range_int(arr, ULIB_VA_ARG(args,int), ULIB_VA_ARG(args,int));
 			break;
-		case ARRAY_DOUBLE:
+		case TYPE_DOUBLE:
 			array__fill_range_db(arr, ULIB_VA_ARG(args,double), ULIB_VA_ARG(args,double));
 			break;
 	}
@@ -401,12 +399,12 @@ void array__fill_linspace(array* arr, ...){
 
 	ULIB_VA_START(args, arr);
 	switch(arr->type){
-		case ARRAY_INT:
+		case TYPE_INT:
 			start_i = ULIB_VA_ARG(args,int);
 			step_i = ULIB_VA_ARG(args,int);
 			array__fill_linspace_int(arr, start_i, step_i);
 			break;
-		case ARRAY_DOUBLE:
+		case TYPE_DOUBLE:
 			start_db = ULIB_VA_ARG(args,double);
 			step_db = ULIB_VA_ARG(args,double);
 			array__fill_linspace_db(arr, start_db, step_db);
@@ -489,9 +487,9 @@ unsigned int array__imax_db(array* arr){
 
 unsigned int array__imax(array* arr){
 	switch(arr->type){
-		case ARRAY_INT: default:
+		case TYPE_INT: default:
 			return array__imax_int(arr);
-		case ARRAY_DOUBLE:
+		case TYPE_DOUBLE:
 			return array__imax_db(arr);
 	}
 }
@@ -523,9 +521,9 @@ unsigned int array__imin_db(array* arr){
 
 unsigned int array__imin(array* arr){
 	switch(arr->type){
-		case ARRAY_INT: default:
+		case TYPE_INT: default:
 			return array__imin_int(arr);
-		case ARRAY_DOUBLE:
+		case TYPE_DOUBLE:
 			return array__imin_db(arr);
 	}
 }
@@ -554,9 +552,9 @@ double array__mean_db(array* arr){
 
 double array__mean(array* arr){
 	switch(arr->type){
-		case ARRAY_INT: default:
+		case TYPE_INT: default:
 			return array__mean_int(arr);
-		case ARRAY_DOUBLE:
+		case TYPE_DOUBLE:
 			return array__mean_db(arr);
 	}
 }

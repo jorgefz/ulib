@@ -157,10 +157,9 @@ int main() {
 ```
 
 
-
 ## Array.h
 
-This section is a Work in Progress.
+Array of fixed size for integers and double floating-type numbers, on which a number of operations can be performed. This is useful for scientific programming and data analysis.
 
 ### Initialisation
 ```c
