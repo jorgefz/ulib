@@ -165,6 +165,7 @@ Array of fixed size for integers and double floating-type numbers, on which a nu
 ```c
 array* array_new(ulong size, uint type);
 ```
+
 ### Methods
 ```c
 free (array* arr);

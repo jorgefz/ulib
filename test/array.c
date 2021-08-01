@@ -14,7 +14,8 @@ int main(){
 		return 1;
 	}
 
-	/* __array_debug(arr); */
+	/* array_debug(arr); */
+	printf("Length: %u\n", arr->length(arr));
 	arr->fill(arr,5);
 	arr->print(arr);
 	arr->range(arr,10,-10);

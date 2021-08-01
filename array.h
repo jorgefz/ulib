@@ -20,6 +20,24 @@ Compiler: GCC version 9.2.0 (tdm64-1)
 
 VERSIONS
 
+v0.3 - 01/08/2021
+	- Migrated typing to types.h.
+		ARRAY_INT => TYPE_INT
+		ARRAY_DOUBLE => TYPE_DOUBLE
+	- Changed all unsigned longs to unsigned ints.
+	- Added length() function to obtain length of array.
+
+	--> defs.h Added checks for NAN, INF, and -INF:
+		ulib_nan()
+		ulib_pinf()
+		ulib_ninf()
+		ulib_isnan(n)
+		ulib_isinf()
+		ulib_ispinf()
+		ulib_isninf()
+
+	--> Dropped support for ints. Array only works with doubles.
+
 v0.1 - 18/03/2021
 	- Basics: array_new() and free()
 	- Value generators: fill(), range(), linspace(), from_c_array()
@@ -29,14 +47,9 @@ v0.1 - 18/03/2021
 	- Get values (geti, getf) or a pointer (at).
 	- Set values (seti, setf)
 
-v0.2 - 19/03/2021
-	- Rewritten in ANSI C89
-	- Renamed functions to avoid reserved double underscore
-	- Fixed bug with linespace function
-	- Added functions for max and min (and their indices)
-	- Added functions for element-wise sum and the mean.
-
 Planned
+	- Drop support for ints. Make it exclusive for doubles.
+
 	- Generic: reverse
 	- Stats: median, stdev, etc
 	- Operations: add, sub, mult, div, mod
@@ -67,11 +80,12 @@ Planned
 typedef struct array__struct array;
 struct array__struct {
 	char* data;
-	unsigned long size;
+	unsigned int size;
 	unsigned int type;
-	unsigned long bytes; /* size in bytes of each member */
+	unsigned int bytes; /* size in bytes of each member */
 
 	/* Function pointers */
+	unsigned int (*length)(array*);
 	void (*free)(array*);
 	void (*print)(array*);
 
@@ -81,12 +95,12 @@ struct array__struct {
 	void (*from_c_array)(array*, const void* c_arr);
 	void (*reverse)(array*);
 
-	void (*seti)(array*, unsigned long ind, int value);
-	void (*setf)(array*, unsigned long ind, double value);
+	void (*seti)(array*, unsigned int ind, int value);
+	void (*setf)(array*, unsigned int ind, double value);
 
-	int (*geti)(array*, unsigned long ind);
-	double (*getf)(array*, unsigned long ind);
-	char* (*at)(array*, unsigned long ind);
+	int (*geti)(array*, unsigned int ind);
+	double (*getf)(array*, unsigned int ind);
+	char* (*at)(array*, unsigned int ind);
 
 	/* stats */
 	int (*maxi)(array*);
@@ -105,18 +119,19 @@ struct array__struct {
  *	FUNCTION DECLARATIONS
  */
 
-unsigned long array__type_bytes(unsigned int type);
+unsigned int array__type_bytes(unsigned int type);
 
-array* array_new(unsigned long size, unsigned int type);
+array* array_new(unsigned int size, unsigned int type);
+unsigned int array__length(array* arr);
 void array__free(array* arr);
 void array__debug(array* arr);
 void array__from_c_array(array* arr, const void* c_arr);   
 
-int     array__getval_int(array* arr, unsigned long ind);
-double  array__getval_db(array* arr, unsigned long ind);
-char*   array__getptr(array* arr, unsigned long ind);
-void    array__setval_int(array* arr, unsigned long ind, int value);
-void    array__setval_db(array* arr, unsigned long ind, double value);
+int     array__getval_int(array* arr, unsigned int ind);
+double  array__getval_db(array* arr, unsigned int ind);
+char*   array__getptr(array* arr, unsigned int ind);
+void    array__setval_int(array* arr, unsigned int ind, int value);
+void    array__setval_db(array* arr, unsigned int ind, double value);
 
 void array__print_int(array* arr);
 void array__print_double(array* arr);
@@ -171,8 +186,8 @@ void array__reverse(array* arr);
 #ifdef ARRAY_IMPLEMENTATION
 
 
-array* array_new(unsigned long size, unsigned int type){
-	unsigned long bytes;
+array* array_new(unsigned int size, unsigned int type){
+	unsigned int bytes;
 	array* arr;
 
 	/* Supported types */
@@ -191,42 +206,47 @@ array* array_new(unsigned long size, unsigned int type){
 	if(!arr->data) return NULL;
 	
 	/* Function pointers */
-	arr->free = &array__free;
-	arr->fill = &array__fill;
-	arr->print = &array__print;
-	arr->range = &array__fill_range;
-	arr->linspace = &array__fill_linspace;
-	arr->geti = &array__getval_int;
-	arr->getf = &array__getval_db;
-	arr->at = &array__getptr;
-	arr->seti = &array__setval_int;
-	arr->setf = &array__setval_db;
-	arr->from_c_array = &array__from_c_array;
+	arr->length = array__length;
+	arr->free = array__free;
+	arr->fill = array__fill;
+	arr->print = array__print;
+	arr->range = array__fill_range;
+	arr->linspace = array__fill_linspace;
+	arr->geti = array__getval_int;
+	arr->getf = array__getval_db;
+	arr->at = array__getptr;
+	arr->seti = array__setval_int;
+	arr->setf = array__setval_db;
+	arr->from_c_array = array__from_c_array;
 
-	arr->maxi = &array__max_int;
-	arr->maxf = &array__max_db;
-	arr->imax = &array__imax;
+	arr->maxi = array__max_int;
+	arr->maxf = array__max_db;
+	arr->imax = array__imax;
 
-	arr->mini = &array__min_int;
-	arr->minf = &array__min_db;
-	arr->imin = &array__imin;
+	arr->mini = array__min_int;
+	arr->minf = array__min_db;
+	arr->imin = array__imin;
 
-	arr->sumi = &array__sum_int;
-	arr->sumf = &array__sum_db;
+	arr->sumi = array__sum_int;
+	arr->sumf = array__sum_db;
 
-	arr->mean = &array__mean;
-	arr->reverse = &array__reverse;
+	arr->mean = array__mean;
+	arr->reverse = array__reverse;
 
 	return arr;
 }
 
-unsigned long array__type_bytes(unsigned int type){
+unsigned int array__type_bytes(unsigned int type){
 	switch(type){
 		case TYPE_INT: default:
 			return sizeof(int);
 		case TYPE_DOUBLE:
 			return sizeof(double);
 	}
+}
+
+unsigned int array__length(array* arr){
+	return arr->size;
 }
 
 void array__free(array* arr){
@@ -243,23 +263,23 @@ void array__debug(array* arr){
 	ULIB_PRINTF(" -data: 0x%p to 0x%p\n", &arr->data[0], &arr->data[0]+arr->bytes*(arr->size+1)-1);
 }
 
-int array__getval_int(array* arr, unsigned long ind){
+int array__getval_int(array* arr, unsigned int ind){
 	return *(int*)(&arr->data[0] + arr->bytes*ind);
 }
 
-double array__getval_db(array* arr, unsigned long ind){
+double array__getval_db(array* arr, unsigned int ind){
 	return *(double*)(&arr->data[0] + arr->bytes*ind);
 }
 
-char* array__getptr(array* arr, unsigned long ind){
+char* array__getptr(array* arr, unsigned int ind){
 	return (char*)(&arr->data[0] + arr->bytes*ind);
 }
 
-void array__setval_int(array* arr, unsigned long ind, int value){
+void array__setval_int(array* arr, unsigned int ind, int value){
 	*(int*)(arr->data + arr->bytes*ind) = value;
 }
 
-void array__setval_db(array* arr, unsigned long ind, double value){
+void array__setval_db(array* arr, unsigned int ind, double value){
 	*(double*)(arr->data + arr->bytes*ind) = value;
 }
 
