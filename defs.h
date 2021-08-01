@@ -70,7 +70,18 @@
 	#define ULIB_VA_END va_end
 #endif
 
+/* math.h functions */
+#define ULIB_NAN  (0.0/0.0)
+#define ULIB_PINF (1.0/0.0)
+#define ULIB_NINF (-1.0/0.0)
 
+#define ULIB_ISNAN(N) ((N) != (ULIB_NAN)) 
+#define ILIB_ISPINF(N) ((N)==(ULIB_PINF)
+#define ILIB_ISNINF(N) ((N)==(ULIB_NINF)
+#define ULIB_ISINF(N) ((N)==(ULIB_PINF) || (N)==(ULIB_NINF))
+
+
+/* Function Declarations */
 void* ulib__memcpy(void*, const void*, unsigned int);
 unsigned int ulib__strlen(const char*);
 char* ulib__strcpy(char* dst, const char* src);
