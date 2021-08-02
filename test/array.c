@@ -209,6 +209,27 @@ void test_stats_double(){
 	ULIB_FPRINTF(stderr, "Stats double: PASSED\n");
 }
 
+
+void test_matherr(){
+	array* nums = array_new(10, TYPE_DOUBLE);
+	nums->range(nums, 3.1415, -0.77);
+	nums->setf(nums, 5, ULIB_NAN);
+	nums->setf(nums, 2, ULIB_INF);
+
+	if( array__has_nan(nums) != 1){
+		ULIB_FPRINTF(stderr, "Nans: FAILED\n");
+		exit(1);
+	}
+
+	if( array__has_matherr(nums) != 2){
+		ULIB_FPRINTF(stderr, "Math error: FAILED\n");
+		exit(1);
+	}
+
+	nums->free(nums);
+	ULIB_FPRINTF(stderr, "Math error: PASSED\n");
+}
+
 int main(){
 
 	test_new_int();
@@ -222,6 +243,7 @@ int main(){
 	test_new_double();
 	test_range_double();
 	test_stats_double();
+	test_matherr();
 
 	return 0;
 }

@@ -174,6 +174,9 @@ double array__mean_int(array* arr);
 double array__mean_db(array* arr);
 double array__mean(array* arr);
 
+int array__has_nan(array* arr);
+int array__has_matherr(array* arr);
+
 /* No need to know type, just copy chunks of bytes around */
 void array__reverse(array* arr);
 
@@ -581,6 +584,28 @@ double array__mean(array* arr){
 		case TYPE_DOUBLE:
 			return array__mean_db(arr);
 	}
+}
+
+int array__has_nan(array* arr){
+	if (arr->type == TYPE_INT) return 0;
+	unsigned int i, cnt = 0;
+	for(i=0; i!=arr->length(arr); ++i){
+		if( ULIB_ISNAN(arr->getf(arr,i)) ){
+			cnt++;
+		}
+	}
+	return cnt;
+}
+
+int array__has_matherr(array* arr){
+	if (arr->type == TYPE_INT) return 0;
+	unsigned int i, cnt = 0;
+	for(i=0; i!=arr->length(arr); ++i){
+		if( ULIB_ISNAN(arr->getf(arr,i)) || ULIB_ISINF(arr->getf(arr,i)) ){
+			cnt++;
+		}
+	}
+	return cnt;
 }
 
 void array__reverse(array* arr){

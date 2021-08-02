@@ -74,10 +74,11 @@
 #define ULIB_NAN  (0.0/0.0)
 #define ULIB_PINF (1.0/0.0)
 #define ULIB_NINF (-1.0/0.0)
+#define ULIB_INF  ULIB_PINF
 
-#define ULIB_ISNAN(N)  ((N) != (ULIB_NAN)) 
-#define ILIB_ISPINF(N) ((N) == (ULIB_PINF))
-#define ILIB_ISNINF(N) ((N) == (ULIB_NINF))
+#define ULIB_ISNAN(N)  ((N) != (N)) 
+#define ULIB_ISPINF(N) ((N) == (ULIB_PINF))
+#define ULIB_ISNINF(N) ((N) == (ULIB_NINF))
 #define ULIB_ISINF(N)  (ULIB_ISPINF(N) || ULIB_ISNINF(N))
 
 
