@@ -26,6 +26,11 @@ v0.3 - 01/08/2021
 		ARRAY_DOUBLE => TYPE_DOUBLE
 	- Changed all unsigned longs to unsigned ints.
 	- Added length() function to obtain length of array.
+	- Added checks for math errors:
+		array->has_nan()
+		array->has_inf()
+		array->has_matherr()
+
 
 	--> defs.h Added checks for NAN, INF, and -INF:
 		ulib_nan()
@@ -396,7 +401,6 @@ void array__fill_range(array* arr, ...){
 */
 
 void array__fill_linspace_int(array* arr, int start, int step){
-	ULIB_PRINTF("LINSPACE_INT: %d, %d\n", start, step);
 	unsigned int i;
 	for(i=0; i!=arr->size; ++i){
 		arr->seti(arr, i, start);

@@ -5,6 +5,14 @@ ULib - Utilities Library for the C Programming Language
 
 === VERSION HISTORY ===
 
+Version 0.8 - 02/08/2021
+	- array.h: migrated typing to "types.h". Use TYPE_INT and TYPE_DOUBLE
+		instead of ARRAY_INT and ARRAY_DOUBLE.
+	- array.h: added array->length() to return number of items in array.
+	- array.h: improved tests
+	- defs.h: added NaN and INF defines and checks.
+	- array.h: added math-error checking
+
 Version 0.7 - 30/07/2021
 	- string.h: length is not obtained from function string->length(string).
 	- string.h: string_new accepts formatted string (like printf, etc).
